@@ -1,0 +1,25 @@
+/*
+    adds two numbers together (a, b)
+*/
+fn add(a, b) {
+    return a + b;
+}
+
+/*
+    2d point struct
+*/
+struct Point {
+    x: i64;
+    y: i64;
+}
+
+export fn main() {
+    let p: ptr = alloc_struct(Point);
+
+    p.x = 10;
+    p.y = 20;
+
+    let z = add(10, 5);
+
+    return p.x + p.y + z;
+}
