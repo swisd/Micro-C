@@ -1,0 +1,258 @@
+/*
+========================================================
+Micro-C Full Language Stress Test
+Tests:
+- exports
+- functions
+- recursion
+- arithmetic
+- comparisons
+- branching
+- loops
+- nested function calls
+- structs
+- arrays
+- variable assignment
+- function parameters
+- temporary values
+========================================================
+*/
+
+export fn main() {
+    let result = run_all_tests();
+    return result;
+}
+
+/*
+========================================================
+Basic arithmetic
+========================================================
+*/
+fn add(a, b) {
+    return a + b;
+}
+
+fn sub(a, b) {
+    return a - b;
+}
+
+fn mul(a, b) {
+    let result = 0;
+    let i = 0;
+
+    loop {
+        if (i == b) {
+            return result;
+        }
+
+        result = result + a;
+        i = i + 1;
+    }
+}
+
+fn div(a, b) {
+    let count = 0;
+    let temp = a;
+
+    loop {
+        if (temp < b) {
+            return count;
+        }
+
+        temp = temp - b;
+        count = count + 1;
+    }
+}
+
+/*
+========================================================
+Recursion test
+========================================================
+*/
+fn factorial(n) {
+    if (n == 0) {
+        return 1;
+    }
+
+    return n * factorial(n - 1);
+}
+
+fn fib(n) {
+    if (n == 0) {
+        return 0;
+    }
+
+    if (n == 1) {
+        return 1;
+    }
+
+    return fib(n - 1) + fib(n - 2);
+}
+
+/*
+========================================================
+Struct test
+========================================================
+*/
+struct Point {
+    x: i64;
+    y: i64;
+}
+
+//Field() not implemented
+/*
+fn make_point(xv, yv) {
+    let p: ptr = alloc_struct(Point);
+
+    p.x = xv;
+    p.y = yv;
+
+    return p;
+}
+
+fn point_sum(p) {
+    return p.x + p.y;
+}
+*/
+
+/*
+========================================================
+Array test
+========================================================
+*/
+// Arrays not implemented yet
+//fn array_test() {
+//    let arr = [10, 20, 30, 40, 50];
+//
+//    let temp = arr[0];
+//    arr[0] = arr[4];
+//    arr[4] = temp;
+//
+//    let val_1 = arr[0]
+//    let val_2 = arr[4]
+//
+//    return val_1 + val_2;
+//}
+
+/*
+========================================================
+Comparison test
+========================================================
+*/
+fn comparison_test(a, b) {
+    if (a == b) {
+        return 100;
+    }
+
+    if (a > b) {
+        return 200;
+    }
+
+    if (a < b) {
+        return 300;
+    }
+
+    return 0;
+}
+
+/*
+========================================================
+Loop accumulation test
+========================================================
+*/
+fn sum_to_n(n) {
+    let i = 0;
+    let sum = 0;
+
+    loop {
+        if (i == n) {
+            return sum;
+        }
+
+        sum = sum + i;
+        i = i + 1;
+    }
+}
+
+/*
+========================================================
+Nested call test
+========================================================
+*/
+fn nested_calls() {
+    return add(
+        mul(2, 3),
+        sub(
+            factorial(4),
+            fib(6)
+        )
+    );
+}
+
+/*
+========================================================
+Large mixed integration test
+========================================================
+*/
+fn run_all_tests() {
+
+    //--------------------------------------------
+    // arithmetic
+    //--------------------------------------------
+    let a1 = add(10, 5);
+    let a2 = sub(20, 3);
+    let a3 = mul(6, 7);
+    let a4 = div(100, 5);
+
+    //--------------------------------------------
+    // recursion
+    //--------------------------------------------
+    let r1 = factorial(5);
+    let r2 = fib(8);
+
+    //--------------------------------------------
+    // structs
+    //--------------------------------------------
+    //let pt = make_point(11, 22);
+    let s1 = 33;//point_sum(pt);
+
+    //--------------------------------------------
+    // arrays
+    //--------------------------------------------
+    let ar = 0; //array_test();
+
+    //--------------------------------------------
+    // comparisons
+    //--------------------------------------------
+    let c1 = comparison_test(5, 5);
+    let c2 = comparison_test(9, 4);
+    let c3 = comparison_test(2, 7);
+
+    //--------------------------------------------
+    // loops
+    //--------------------------------------------
+    let l1 = sum_to_n(10);
+
+    //--------------------------------------------
+    // nested calls
+    //--------------------------------------------
+    let n1 = nested_calls();
+
+    //--------------------------------------------
+    // final aggregate
+    //--------------------------------------------
+    return
+        a1 +
+        a2 +
+        a3 +
+        a4 +
+        r1 +
+        r2 +
+        s1 +
+        ar +
+        c1 +
+        c2 +
+        c3 +
+        l1 +
+        n1;
+}

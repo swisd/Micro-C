@@ -11,7 +11,8 @@ mod compiler;
 mod arch;
 mod stackframe;
 
-use std::fs;
+use std::{env, fs};
+use std::fs::read_to_string;
 use lexer::Lexer;
 use parser::Parser;
 use interpreter::Interpreter;
@@ -53,18 +54,22 @@ fn main() {
 //     let result = interp.run(&ast);
 //
 //     println!("Result: {}", result);
-    let source = r#"
-fn add(a, b) {
-    return a + b;
-}
+    let args: Vec<String> = env::args().collect();
 
-export fn main() {
-    let x = add(5, 3);
-    return x;
-}
-"#;
+    // args[0] is the program name, args[1] is the first user argument
 
-    let asm = compile(source, "x86_64");
+//     let source = r#"
+// fn add(a, b) {
+//     return a + b;
+// }
+//
+// export fn main() {
+//     let x = add(5, 3);
+//     return x;
+// }
+// "#;
+    let source = read_to_string(args[1].clone()).expect("issue");
+    let asm = compile(&*source, "x86_64");
 
     println!("{}", asm);
 }

@@ -6,7 +6,8 @@ pub struct IRGenerator {
     temp_count: usize,
     label_count: usize,
     pub code: Vec<IRInst>,
-    pub function_params: HashMap<String, Vec<String>>
+    pub function_params: HashMap<String, Vec<String>>,
+    position: u64,
 }
 
 impl IRGenerator {
@@ -16,6 +17,7 @@ impl IRGenerator {
             label_count: 0,
             code: vec![],
             function_params: HashMap::new(),
+            position: 0
         }
     }
 
@@ -38,6 +40,7 @@ impl IRGenerator {
     }
 
     pub fn gen_stmt(&mut self, stmt: Stmt) {
+        self.position += 1;
         match stmt {
             Stmt::Let { name, value, .. } => {
                 let v = self.gen_expr(value);
@@ -164,7 +167,7 @@ impl IRGenerator {
                 out
             }
 
-            _ => unimplemented!(),
+            _ => unimplemented!("{:#X} {:?}", self.position, expr),
         }
     }
 }

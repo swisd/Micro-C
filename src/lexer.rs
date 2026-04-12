@@ -1,3 +1,5 @@
+use std::fmt;
+
 #[derive(Debug, Clone, PartialEq)]
 pub enum Token {
     Let, Fn, Return,
@@ -24,6 +26,75 @@ pub enum Token {
     Assign,
 
     EOF,
+    Arrow,
+}
+
+impl fmt::Display for Token {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            //----------------------------------------
+            // Keywords
+            //----------------------------------------
+            Token::Let => write!(f, "let"),
+            Token::Fn => write!(f, "fn"),
+            Token::Return => write!(f, "return"),
+            Token::If => write!(f, "if"),
+            Token::Elif => write!(f, "elif"),
+            Token::Else => write!(f, "else"),
+            Token::Loop => write!(f, "loop"),
+            Token::Break => write!(f, "break"),
+            Token::Continue => write!(f, "continue"),
+            Token::Export => write!(f, "export"),
+            Token::Struct => write!(f, "struct"),
+
+            //----------------------------------------
+            // Identifiers / literals
+            //----------------------------------------
+            Token::Ident(name) => write!(f, "{}", name),
+            Token::Number(n) => write!(f, "{}", n),
+
+            //----------------------------------------
+            // Operators
+            //----------------------------------------
+            Token::Plus => write!(f, "+"),
+            Token::Minus => write!(f, "-"),
+            Token::Star => write!(f, "*"),
+            Token::Slash => write!(f, "/"),
+
+            Token::Assign => write!(f, "="),
+            Token::EqEq => write!(f, "=="),
+            Token::NotEq => write!(f, "!="),
+            Token::Lt => write!(f, "<"),
+            Token::LtEq => write!(f, "<="),
+            Token::Gt => write!(f, ">"),
+            Token::GtEq => write!(f, ">="),
+
+            //----------------------------------------
+            // Delimiters
+            //----------------------------------------
+            Token::LParen => write!(f, "("),
+            Token::RParen => write!(f, ")"),
+            Token::LBrace => write!(f, "{{"),
+            Token::RBrace => write!(f, "}}"),
+            Token::LBracket => write!(f, "["),
+            Token::RBracket => write!(f, "]"),
+
+            Token::Comma => write!(f, ","),
+            Token::Semicolon => write!(f, ";"),
+            Token::Colon => write!(f, ":"),
+            Token::Dot => write!(f, "."),
+
+            //----------------------------------------
+            // End of file
+            //----------------------------------------
+            Token::EOF => write!(f, "<EOF>"),
+
+            //----------------------------------------
+            // Fallback for future tokens
+            //----------------------------------------
+            other => write!(f, "{:?}", other),
+        }
+    }
 }
 
 pub struct Lexer {

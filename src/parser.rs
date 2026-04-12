@@ -5,24 +5,26 @@ pub struct Parser {
     lexer: Lexer,
     current: Token,
     next: Token,
+    position: u64,
 }
 
 impl Parser {
     pub fn new(mut lexer: Lexer) -> Self {
         let current = lexer.next_token();
         let next = lexer.next_token();
-        Self { lexer, current, next }
+        Self { lexer, current, next, position:0 }
     }
 
     fn advance(&mut self) {
         self.current = std::mem::replace(&mut self.next, self.lexer.next_token());
+        self.position += 1;
     }
 
     fn expect(&mut self, t: Token) {
         if self.current == t {
             self.advance();
         } else {
-            panic!("Expected {:?}, got {:?}", t, self.current);
+            panic!("? (@{:#X}), Expected {:?}, got {:?}\n {} {}\n ^", self.position, t, self.current, self.current, self.next);
         }
     }
 
@@ -452,7 +454,7 @@ impl Parser {
                 expr
             }
 
-            _ => panic!("Unexpected token: {:?}", self.current),
+            _ => panic!("? (@{:#X}) Unexpected token: {}\n {} {}\n ^", self.position, self.current, self.current, self.next),
         }
     }
 }
