@@ -42,9 +42,7 @@ impl Architecture for WIN64Backend {
 
         let mut frame = StackFrame::new();
 
-        //----------------------------------------
-        // Preallocate stack slots
-        //----------------------------------------
+        // preallocate stack slots
         for inst in ir {
             match inst {
                 IRInst::StoreVar(name, _) => {
@@ -75,15 +73,12 @@ impl Architecture for WIN64Backend {
         out.push_str("    ret\n\n");
 
 
-        //----------------------------------------
-        // Emit instructions
-        //----------------------------------------
+        // emit instructions
         for inst in ir {
             match inst {
 
-                //--------------------------------
-                // FUNCTION LABEL
-                //--------------------------------
+
+                // func label
                 IRInst::Label(name) => {
                     let actual = if name == "main" {
                         "micro_main"
@@ -96,11 +91,8 @@ impl Architecture for WIN64Backend {
                     out.push_str("    mov rbp, rsp\n");
                     out.push_str(&format!("    sub rsp, {}\n", (frame_size + 8)));
 
-                    //--------------------------------
-                    // Save incoming parameters
-                    //--------------------------------
+                    // Save incoming params
                     if let Some(params) = self.function_params.get(name) {
-
                         for param in params {
                             frame.alloc(param);
                         }
@@ -121,17 +113,11 @@ impl Architecture for WIN64Backend {
                     }
                 }
 
-                //--------------------------------
-                // LOAD CONST
-                //--------------------------------
                 IRInst::LoadConst(dst, val) => {
                     let rd = self.regs.alloc(dst);
                     out.push_str(&format!("    mov {}, {}\n", rd, val));
                 }
 
-                //--------------------------------
-                // LOAD VAR
-                //--------------------------------
                 IRInst::LoadVar(dst, src) => {
                     let rd = self.regs.alloc(dst);
                     let off = frame.get(src);
@@ -143,9 +129,6 @@ impl Architecture for WIN64Backend {
                     ));
                 }
 
-                //--------------------------------
-                // STORE VAR
-                //--------------------------------
                 IRInst::StoreVar(dst, src) => {
                     let rs = self.regs.alloc(src);
                     let off = frame.get(dst);
@@ -157,9 +140,6 @@ impl Architecture for WIN64Backend {
                     ));
                 }
 
-                //--------------------------------
-                // ADD
-                //--------------------------------
                 IRInst::Add(dst, a, b) => {
                     let rd = self.regs.alloc(dst);
                     let ra = self.regs.alloc(a);
@@ -169,9 +149,6 @@ impl Architecture for WIN64Backend {
                     out.push_str(&format!("    add {}, {}\n", rd, rb));
                 }
 
-                //--------------------------------
-                // SUB
-                //--------------------------------
                 IRInst::Sub(dst, a, b) => {
                     let rd = self.regs.alloc(dst);
                     let ra = self.regs.alloc(a);
@@ -181,9 +158,6 @@ impl Architecture for WIN64Backend {
                     out.push_str(&format!("    sub {}, {}\n", rd, rb));
                 }
 
-                //--------------------------------
-                // FUNCTION CALL
-                //--------------------------------
                 IRInst::Call(dst, func, args) => {
                     let arg_regs = ["rcx", "rdx", "r8", "r9"];
 
@@ -204,9 +178,6 @@ impl Architecture for WIN64Backend {
                     out.push_str(&format!("    mov {}, rax\n", rd));
                 }
 
-                //--------------------------------
-                // RETURN
-                //--------------------------------
                 IRInst::Return(src) => {
                     let rs = self.regs.alloc(src);
 

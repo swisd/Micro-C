@@ -58,18 +58,18 @@ impl X86_64RawBackend {
     ) -> StackFrame {
         let mut frame = StackFrame::new();
 
-        //----------------------------------------
+
         // Allocate params first
-        //----------------------------------------
+
         if let Some(params) = self.function_params.get(name) {
             for p in params {
                 frame.alloc(p);
             }
         }
 
-        //----------------------------------------
+
         // Allocate locals used in function body
-        //----------------------------------------
+
         for inst in body {
             match inst {
                 IRInst::StoreVar(name, _) => {
@@ -98,17 +98,17 @@ impl X86_64RawBackend {
         let mut frame = self.build_frame(name, body);
         let frame_size = frame.frame_size() + 8;
 
-        //----------------------------------------
+
         // Function label
-        //----------------------------------------
+
         out.push_str(&format!("{}:\n", name));
         out.push_str("    push rbp\n");
         out.push_str("    mov rbp, rsp\n");
         out.push_str(&format!("    sub rsp, {}\n", frame_size));
 
-        //----------------------------------------
+
         // Save incoming parameters
-        //----------------------------------------
+
         if let Some(params) = self.function_params.get(name) {
             for (i, param) in params.iter().enumerate() {
                 if i >= arg_regs.len() {
@@ -125,16 +125,16 @@ impl X86_64RawBackend {
             }
         }
 
-        //----------------------------------------
+
         // Emit body
-        //----------------------------------------
+
         for inst in body {
             self.emit_inst(out, inst, &mut frame);
         }
 
-        //----------------------------------------
+
         // Default epilogue if no return emitted
-        //----------------------------------------
+
         out.push_str("    mov rsp, rbp\n");
         out.push_str("    pop rbp\n");
         out.push_str("    ret\n\n");
@@ -148,9 +148,6 @@ impl X86_64RawBackend {
     ) {
         match inst {
 
-            //----------------------------------------
-            // LOAD CONST
-            //----------------------------------------
             IRInst::LoadConst(dst, val) => {
                 let rd = self.regs.alloc(dst);
                 out.push_str(&format!(
@@ -160,9 +157,6 @@ impl X86_64RawBackend {
                 ));
             }
 
-            //----------------------------------------
-            // LOAD VAR
-            //----------------------------------------
             IRInst::LoadVar(dst, src) => {
                 let rd = self.regs.alloc(dst);
                 let off = frame.get(src);
@@ -174,9 +168,6 @@ impl X86_64RawBackend {
                 ));
             }
 
-            //----------------------------------------
-            // STORE VAR
-            //----------------------------------------
             IRInst::StoreVar(dst, src) => {
                 let rs = self.regs.alloc(src);
                 let off = frame.get(dst);
@@ -188,9 +179,6 @@ impl X86_64RawBackend {
                 ));
             }
 
-            //----------------------------------------
-            // ADD
-            //----------------------------------------
             IRInst::Add(dst, a, b) => {
                 let rd = self.regs.alloc(dst);
                 let ra = self.regs.alloc(a);
@@ -208,9 +196,6 @@ impl X86_64RawBackend {
                 ));
             }
 
-            //----------------------------------------
-            // SUB
-            //----------------------------------------
             IRInst::Sub(dst, a, b) => {
                 let rd = self.regs.alloc(dst);
                 let ra = self.regs.alloc(a);
@@ -228,9 +213,7 @@ impl X86_64RawBackend {
                 ));
             }
 
-            //----------------------------------------
-            // FUNCTION CALL
-            //----------------------------------------
+
             IRInst::Call(dst, func, args) => {
                 let arg_regs = ["rcx", "rdx", "r8", "r9"];
 
@@ -248,9 +231,9 @@ impl X86_64RawBackend {
                     ));
                 }
 
-                //----------------------------------------
+
                 // RAW backend: no Windows shadow space
-                //----------------------------------------
+
                 out.push_str(&format!(
                     "    call {}\n",
                     func
@@ -263,9 +246,6 @@ impl X86_64RawBackend {
                 ));
             }
 
-            //----------------------------------------
-            // RETURN
-            //----------------------------------------
             IRInst::Return(src) => {
                 let rs = self.regs.alloc(src);
 
@@ -278,9 +258,6 @@ impl X86_64RawBackend {
                 out.push_str("    ret\n");
             }
 
-            //----------------------------------------
-            // EQ
-            //----------------------------------------
             IRInst::Eq(dst, a, b) => {
                 let rd = self.regs.alloc(dst);
                 let ra = self.regs.alloc(a);
@@ -299,9 +276,6 @@ impl X86_64RawBackend {
                 ));
             }
 
-            //----------------------------------------
-            // NEQ
-            //----------------------------------------
             IRInst::Neq(dst, a, b) => {
                 let rd = self.regs.alloc(dst);
                 let ra = self.regs.alloc(a);
@@ -320,9 +294,6 @@ impl X86_64RawBackend {
                 ));
             }
 
-            //----------------------------------------
-            // LT
-            //----------------------------------------
             IRInst::Lt(dst, a, b) => {
                 let rd = self.regs.alloc(dst);
                 let ra = self.regs.alloc(a);
@@ -341,9 +312,8 @@ impl X86_64RawBackend {
                 ));
             }
 
-            //----------------------------------------
-            // GT
-            //----------------------------------------
+            
+
             IRInst::Gt(dst, a, b) => {
                 let rd = self.regs.alloc(dst);
                 let ra = self.regs.alloc(a);
@@ -362,9 +332,8 @@ impl X86_64RawBackend {
                 ));
             }
 
-            //----------------------------------------
-            // JUMP IF ZERO
-            //----------------------------------------
+            
+
             IRInst::JumpIfZero(cond, label) => {
                 let rc = self.regs.alloc(cond);
 
@@ -378,9 +347,8 @@ impl X86_64RawBackend {
                 ));
             }
 
-            //----------------------------------------
-            // JUMP
-            //----------------------------------------
+            
+
             IRInst::Jump(label) => {
                 out.push_str(&format!(
                     "    jmp {}\n",
@@ -388,9 +356,9 @@ impl X86_64RawBackend {
                 ));
             }
 
-            //----------------------------------------
+
             // Ignore labels here
-            //----------------------------------------
+
             IRInst::Label(_) => {}
 
             _ => {}
@@ -402,9 +370,7 @@ impl Architecture for X86_64RawBackend {
     fn emit_program(&mut self, ir: &[IRInst]) -> String {
         let mut out = String::new();
 
-        //----------------------------------------
-        // Raw binary header
-        //----------------------------------------
+        // raw binary asm header
         out.push_str("; ARCH x86_64\n");
         out.push_str("; Generated ASM file. Modifications will not be preserved\n");
 
@@ -412,18 +378,13 @@ impl Architecture for X86_64RawBackend {
         out.push_str("BITS 64\n");
         out.push_str("ORG 0x100000\n\n");
 
-        //----------------------------------------
-        // Bare metal entrypoint
-        //----------------------------------------
+        // x86_64 bare metal entrypoint
         out.push_str("_start:\n");
         out.push_str("    call main\n");
         out.push_str(".halt:\n");
         out.push_str("    hlt\n");
         out.push_str("    jmp .halt\n\n");
 
-        //----------------------------------------
-        // Split functions and emit each
-        //----------------------------------------
         let funcs = Self::split_functions(ir);
 
         for (name, body) in funcs {

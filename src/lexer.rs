@@ -32,9 +32,6 @@ pub enum Token {
 impl fmt::Display for Token {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            //----------------------------------------
-            // Keywords
-            //----------------------------------------
             Token::Let => write!(f, "let"),
             Token::Fn => write!(f, "fn"),
             Token::Return => write!(f, "return"),
@@ -47,15 +44,9 @@ impl fmt::Display for Token {
             Token::Export => write!(f, "export"),
             Token::Struct => write!(f, "struct"),
 
-            //----------------------------------------
-            // Identifiers / literals
-            //----------------------------------------
             Token::Ident(name) => write!(f, "{}", name),
             Token::Number(n) => write!(f, "{}", n),
 
-            //----------------------------------------
-            // Operators
-            //----------------------------------------
             Token::Plus => write!(f, "+"),
             Token::Minus => write!(f, "-"),
             Token::Star => write!(f, "*"),
@@ -69,9 +60,6 @@ impl fmt::Display for Token {
             Token::Gt => write!(f, ">"),
             Token::GtEq => write!(f, ">="),
 
-            //----------------------------------------
-            // Delimiters
-            //----------------------------------------
             Token::LParen => write!(f, "("),
             Token::RParen => write!(f, ")"),
             Token::LBrace => write!(f, "{{"),
@@ -84,14 +72,9 @@ impl fmt::Display for Token {
             Token::Colon => write!(f, ":"),
             Token::Dot => write!(f, "."),
 
-            //----------------------------------------
-            // End of file
-            //----------------------------------------
             Token::EOF => write!(f, "<EOF>"),
 
-            //----------------------------------------
-            // Fallback for future tokens
-            //----------------------------------------
+            //fallback for future tokens
             other => write!(f, "{:?}", other),
         }
     }

@@ -38,8 +38,6 @@ impl Parser {
         stmts
     }
 
-    // ================= STATEMENTS =================
-
     fn parse_stmt(&mut self) -> Stmt {
         match self.current {
             Token::Let => self.parse_let(),
@@ -298,7 +296,6 @@ impl Parser {
         Stmt::Return(e)
     }
 
-    // ================= EXPRESSIONS =================
 
     fn parse_expr(&mut self) -> Expr {
         self.parse_equality()
