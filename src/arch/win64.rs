@@ -1,9 +1,18 @@
-use std::collections::HashMap;
+//! Windows x64 backend.
+//!
+//! This backend generates x86_64 assembly following the Windows x64 Calling Convention.
+
+use alloc::string::{String, ToString};
+use alloc::{format, vec};
+use alloc::vec::Vec;
+use hashbrown::HashMap;
 use crate::arch::Architecture;
+use crate::error::error;
 use crate::ir::IRInst;
 use crate::regalloc::RegisterAllocator;
 use crate::stackframe::StackFrame;
 
+/// Backend for generating Windows-compatible x64 assembly.
 pub struct WIN64Backend {
     regs: RegisterAllocator,
     function_params: HashMap<String, Vec<String>>,
@@ -99,7 +108,8 @@ impl Architecture for WIN64Backend {
 
                         for (i, param) in params.iter().enumerate() {
                             if i >= arg_regs.len() {
-                                panic!("Too many parameters for Windows ABI");
+                                error("Too many parameters for Windows ABI");
+                                return "".to_string()
                             }
 
                             let off = frame.get(param);

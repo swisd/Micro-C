@@ -1,12 +1,22 @@
 // src/arch/x86_64_raw.rs
 
-use std::collections::HashMap;
+//! Raw x86_64 backend.
+//!
+//! This backend generates x86_64 assembly without any specific OS ABI
+//! assumptions, suitable for bare-metal or simple bootloaders.
+
+use alloc::string::String;
+use alloc::{format, vec};
+use alloc::vec::Vec;
+use hashbrown::HashMap;
 
 use crate::arch::Architecture;
+use crate::error::error;
 use crate::ir::IRInst;
 use crate::regalloc::RegisterAllocator;
 use crate::stackframe::StackFrame;
 
+/// Backend for generating raw x86_64 assembly.
 pub struct X86_64RawBackend {
     regs: RegisterAllocator,
     function_params: HashMap<String, Vec<String>>,
@@ -112,7 +122,8 @@ impl X86_64RawBackend {
         if let Some(params) = self.function_params.get(name) {
             for (i, param) in params.iter().enumerate() {
                 if i >= arg_regs.len() {
-                    panic!("Too many parameters for x86_64 ABI");
+                    error("Too many parameters for x86_64 ABI");
+                    return;
                 }
 
                 let off = frame.get(param);
@@ -219,7 +230,7 @@ impl X86_64RawBackend {
 
                 for (i, arg) in args.iter().enumerate() {
                     if i >= arg_regs.len() {
-                        panic!("Too many call args");
+                        error("Too many call args");
                     }
 
                     let r = self.regs.alloc(arg);

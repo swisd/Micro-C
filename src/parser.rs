@@ -1,22 +1,38 @@
+//! Parser for the Micro-C language.
+//!
+//! This module contains a recursive descent [`Parser`] that converts
+//! a stream of tokens into an Abstract Syntax Tree (AST).
+
+use alloc::boxed::Box;
+use alloc::{format, vec};
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use core::fmt::{Debug, Formatter};
+use core::iter::once;
 use crate::ast::*;
+use crate::error::{error};
+use crate::fs::open_file_or_lib;
 use crate::lexer::{Lexer, Token};
 
+/// Recursive descent parser state.
 pub struct Parser {
     lexer: Lexer,
     current: Token,
     next: Token,
     position: u64,
+    condition: u8,
 }
 
 impl Parser {
+    /// Creates a new Parser from the given Lexer.
     pub fn new(mut lexer: Lexer) -> Self {
         let current = lexer.next_token();
         let next = lexer.next_token();
-        Self { lexer, current, next, position:0 }
+        Self { lexer, current, next, position:0, condition:0, }
     }
 
     fn advance(&mut self) {
-        self.current = std::mem::replace(&mut self.next, self.lexer.next_token());
+        self.current = core::mem::replace(&mut self.next, self.lexer.next_token());
         self.position += 1;
     }
 
@@ -24,10 +40,14 @@ impl Parser {
         if self.current == t {
             self.advance();
         } else {
-            panic!("? (@{:#X}), Expected {:?}, got {:?}\n {} {}\n ^", self.position, t, self.current, self.current, self.next);
+            let arrow = String::from_utf8(vec![b'^'; format!("{}", self.current).len()]).unwrap();
+            error(&format!("(@{:#X}), Expected {:?}, got {:?}\n {} {}\n {}", self.position, t, self.current, self.current, self.next, arrow));
+            self.advance();
+            return;
         }
     }
 
+    /// Parses the entire program into a list of statements.
     pub fn parse_program(&mut self) -> Vec<Stmt> {
         let mut stmts = vec![];
 
@@ -112,7 +132,9 @@ impl Parser {
 
         let name = match self.current.clone() {
             Token::Ident(s) => s,
-            _ => panic!("Expected identifier"),
+            _ => {error("Expected identifier");
+                self.advance();
+                return Stmt::None},
         };
         self.advance();
 
@@ -129,7 +151,11 @@ impl Parser {
                         _ => Type::Struct(t),
                     })
                 }
-                _ => panic!("Expected type"),
+                _ => {
+                    error("Expected type");
+                    self.advance();
+                    return Stmt::None
+                },
             }
         } else {
             None
@@ -145,7 +171,10 @@ impl Parser {
     fn parse_assign(&mut self) -> Stmt {
         let name = match self.current.clone() {
             Token::Ident(s) => s,
-            _ => panic!(),
+            _ => {
+                error("");
+                return Stmt::None
+            },
         };
         self.advance();
 
@@ -161,7 +190,11 @@ impl Parser {
 
         let name = match self.current.clone() {
             Token::Ident(s) => s,
-            _ => panic!("Expected struct name"),
+            _ => {
+                error("Expected struct name");
+                self.advance();
+                return Stmt::None
+            },
         };
         self.advance();
 
@@ -172,7 +205,9 @@ impl Parser {
         while self.current != Token::RBrace {
             let field = match self.current.clone() {
                 Token::Ident(s) => s,
-                _ => panic!("Expected field name"),
+                _ => {error("Expected field name");
+                    self.advance();
+                    return Stmt::None},
             };
             self.advance();
 
@@ -187,7 +222,9 @@ impl Parser {
                         _ => Type::Struct(t),
                     }
                 }
-                _ => panic!("Expected type"),
+                _ => {error("Expected type");
+                    self.advance();
+                    Type::I64},
             };
 
             self.expect(Token::Semicolon);
@@ -212,7 +249,11 @@ impl Parser {
 
         let name = match self.current.clone() {
             Token::Ident(s) => s,
-            _ => panic!("Expected function name"),
+            _ => {
+                error("Expected function name");
+                self.advance();
+                return Stmt::None
+            },
         };
         self.advance();
 
@@ -430,7 +471,11 @@ impl Parser {
 
                             let field = match self.current.clone() {
                                 Token::Ident(s) => s,
-                                _ => panic!("Expected field name"),
+                                _ => {
+                                    let arrow = String::from_utf8(vec![b'^'; format!("{}", self.current).len()]).unwrap();
+                                    error(&format!("(@{:#X}) Expected field name\n {} {}\n {}", self.position, self.current, self.next, arrow));
+                                    self.advance();
+                                    return Expr::Number(0)},
                             };
                             self.advance();
 
@@ -451,7 +496,21 @@ impl Parser {
                 expr
             }
 
-            _ => panic!("? (@{:#X}) Unexpected token: {}\n {} {}\n ^", self.position, self.current, self.current, self.next),
+            Token::Include(p) => {
+                self.advance();
+                // todo: need to add function for library lookup/install
+                let file = open_file_or_lib(&*p);
+                self.lexer.input.extend(file.chars());
+                let path = p.clone();
+                let name: String = if p.contains('.') { p.split('.').last().unwrap().parse().unwrap() } else { p };
+                Expr::Include(path, name)
+            }
+
+            _ => {
+                let arrow = String::from_utf8(vec![b'^'; format!("{}", self.current).len()]).unwrap();
+                error(&format!("(@{:#X}) Unexpected token: {}\n {} {}\n {}", self.position, self.current, self.current, self.next, arrow));
+                self.advance();
+                Expr::Number(0)},
         }
     }
 }

@@ -1,16 +1,29 @@
-use std::collections::HashMap;
+//! Intermediate Representation (IR) generation.
+//!
+//! This module contains the [`IRGenerator`] which lowers the AST into
+//! a flat, three-address-style [`IRInst`] sequence.
+
+use alloc::string::String;
+use alloc::{format, vec};
+use alloc::vec::Vec;
+use hashbrown::HashMap;
 use crate::ast::*;
+use crate::error::error;
 use crate::ir::*;
 
+/// State for generating Intermediate Representation from the AST.
 pub struct IRGenerator {
     temp_count: usize,
     label_count: usize,
+    /// The generated list of IR instructions.
     pub code: Vec<IRInst>,
+    /// Metadata about function parameters, used for backend code generation.
     pub function_params: HashMap<String, Vec<String>>,
     position: u64,
 }
 
 impl IRGenerator {
+    /// Creates a new IRGenerator.
     pub fn new() -> Self {
         Self {
             temp_count: 0,
@@ -33,6 +46,7 @@ impl IRGenerator {
         l
     }
 
+    /// Generates IR for a complete program (list of statements).
     pub fn gen_program(&mut self, stmts: &[Stmt]) {
         for stmt in stmts {
             self.gen_stmt(stmt.clone());
@@ -115,7 +129,7 @@ impl IRGenerator {
                 }
             }
 
-            _ => {}
+            _ => {error(&format!("{:#X} Stmt {:?}", self.position, stmt));}
         }
     }
 
@@ -167,7 +181,7 @@ impl IRGenerator {
                 out
             }
 
-            _ => unimplemented!("{:#X} {:?}", self.position, expr),
+            _ => {error(&format!("{:#X} Expr {:?}", self.position, expr)); String::new()}
         }
     }
 }

@@ -1,4 +1,14 @@
-use std::collections::HashMap;
+//! AST interpreter for Micro-C.
+//!
+//! This module provides an interpreter that can execute Micro-C programs
+//! directly from their Abstract Syntax Tree (AST), useful for testing and
+//! constant folding.
+
+use alloc::boxed::Box;
+use alloc::string::String;
+use alloc::vec;
+use alloc::vec::Vec;
+use hashbrown::HashMap;
 use crate::ast::*;
 
 #[derive(Debug)]
@@ -9,6 +19,7 @@ enum Control {
     Continue,
 }
 
+/// State for the Micro-C AST interpreter.
 pub struct Interpreter {
     scopes: Vec<HashMap<String, i64>>,
     types: HashMap<String, Type>,
@@ -19,6 +30,7 @@ pub struct Interpreter {
 }
 
 impl Interpreter {
+    /// Creates a new Interpreter with a clean state.
     pub fn new() -> Self {
         Self {
             scopes: vec![HashMap::new()],
@@ -129,7 +141,8 @@ impl Interpreter {
                 let offset = self.field_offset(&struct_name, &field);
 
                 *self.memory.get(&(addr + offset)).unwrap_or(&0)
-            }
+            },
+            Expr::Include(_, _) => todo!()
         }
     }
 
@@ -262,11 +275,11 @@ impl Interpreter {
                     return self.exec_block(&then_branch);
                 }
 
-                for (c, b) in elif {
-                    if self.eval(c) != 0 {
-                        return self.exec_block(&b);
-                    }
-                }
+                // for (c, b) in elif {
+                //     if self.eval(c) != 0 {
+                //         return self.exec_block(&b);
+                //     }
+                // }
 
                 if let Some(b) = else_branch {
                     return self.exec_block(&b);
@@ -291,9 +304,11 @@ impl Interpreter {
             Stmt::Continue => Control::Continue,
 
             Stmt::Function { .. } => Control::None,
+            _ => Control::None,
         }
     }
 
+    /// Executes a list of statements and returns the exit code of the `main` function.
     pub fn run(&mut self, stmts: &[Stmt]) -> i64 {
         for s in stmts {
             match s {

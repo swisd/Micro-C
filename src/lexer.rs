@@ -1,5 +1,15 @@
-use std::fmt;
+//! Lexical analyzer for the Micro-C language.
+//!
+//! This module contains the [`Lexer`] which converts a raw string of source code
+//! into a stream of [`Token`]s.
 
+use alloc::format;
+use alloc::string::String;
+use alloc::vec::Vec;
+use core::fmt;
+use crate::error::error;
+
+/// Represents a single unit of the Micro-C language.
 #[derive(Debug, Clone, PartialEq)]
 pub enum Token {
     Let, Fn, Return,
@@ -27,6 +37,8 @@ pub enum Token {
 
     EOF,
     Arrow,
+    Include(String),
+    None,
 }
 
 impl fmt::Display for Token {
@@ -73,6 +85,7 @@ impl fmt::Display for Token {
             Token::Dot => write!(f, "."),
 
             Token::EOF => write!(f, "<EOF>"),
+            Token::Include(name) => write!(f, "#include <{}>", name),
 
             //fallback for future tokens
             other => write!(f, "{:?}", other),
@@ -80,12 +93,14 @@ impl fmt::Display for Token {
     }
 }
 
+/// Lexer state for converting source code into tokens.
 pub struct Lexer {
-    input: Vec<char>,
+    pub input: Vec<char>,
     pos: usize,
 }
 
 impl Lexer {
+    /// Creates a new Lexer from the given source string.
     pub fn new(input: &str) -> Self {
         Self { input: input.chars().collect(), pos: 0 }
     }
@@ -162,6 +177,7 @@ impl Lexer {
         Token::Number(s.parse().unwrap())
     }
 
+    /// Scans and returns the next token from the input.
     pub fn next_token(&mut self) -> Token {
         self.skip_ws();
 
@@ -217,7 +233,7 @@ impl Lexer {
                     self.next();
                     Token::NotEq
                 } else {
-                    panic!("Unexpected !");
+                    {error("Unexpected !"); Token::None}
                 }
             }
 
@@ -249,9 +265,40 @@ impl Lexer {
                 self.number()
             }
 
+            Some('#') => {
+                let mut directive = String::new();
+                // Read the directive name (e.g., "include")
+                while matches!(self.peek(), Some(c) if c.is_alphabetic()) {
+                    directive.push(self.next().unwrap());
+                }
+
+                if directive == "include" {
+                    self.skip_ws();
+                    if self.next() == Some('<') {
+                        let mut module_name = String::new();
+                        // Lex until the closing '>'
+                        while let Some(c) = self.peek() {
+                            if c == '>' {
+                                self.next(); // consume '>'
+                                return Token::Include(module_name);
+                            }
+                            module_name.push(self.next().unwrap());
+                        }
+                        error("Unterminated include directive: expected '>'");
+                        Token::None
+                    } else {
+                        error("Expected '<' after #include");
+                        Token::None
+                    }
+                } else {
+                    error(&format!("Unknown directive #{}", directive));
+                    Token::None
+                }
+            }
+
             None => Token::EOF,
 
-            Some(c) => panic!("Unexpected char {}", c),
+            Some(c) => {error(&format!("Unexpected char {}", c)); Token::None}
         }
     }
 }

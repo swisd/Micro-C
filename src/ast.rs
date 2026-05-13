@@ -1,3 +1,13 @@
+//! Abstract Syntax Tree (AST) definitions.
+//!
+//! This module defines the structure of the Micro-C language after parsing,
+//! consisting of [`Type`]s, [`Expr`]essions, and [`Stmt`]atements.
+
+use alloc::boxed::Box;
+use alloc::string::String;
+use alloc::vec::Vec;
+
+/// Represents a type in Micro-C.
 #[derive(Debug, Clone)]
 pub enum Type {
     I64,
@@ -6,6 +16,7 @@ pub enum Type {
     Struct(String),
 }
 
+/// Represents an expression that evaluates to a value.
 #[derive(Debug, Clone)]
 pub enum Expr {
     Number(i64),
@@ -19,8 +30,10 @@ pub enum Expr {
     Index(Box<Expr>, Box<Expr>),
 
     Field(Box<Expr>, String),
+    Include(String, String)
 }
 
+/// Represents a statement that performs an action.
 #[derive(Debug, Clone)]
 pub enum Stmt {
     Let {
@@ -71,6 +84,10 @@ pub enum Stmt {
         body: Vec<Stmt>,
         export: bool,
     },
+    Import {
+        name: String,
+    },
+    None
 }
 
 #[derive(Debug, Clone, Copy)]
