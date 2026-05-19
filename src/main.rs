@@ -94,17 +94,17 @@ fn add(a, b) {
 /*
     2d point struct
 */
-//struct Point {
-//    x: i64;
-//    y: i64;
-//}
+struct Point {
+    x: i64;
+    y: i64;
+}
 
 // Main entry func
 export fn main() {
-    //let p: ptr = alloc_struct(Point);
+    let p: ptr = alloc_struct(Point);
 
-    //p.x = 10;
-    //p.y = 20;
+    p.x = 10;
+    p.y = 20;
 
     let z = add(10, 5);
 
@@ -114,4 +114,5 @@ export fn main() {
     let asm = compile(&*source, "x86_64");
 
     print(&format!("{}", asm));
+
 }
