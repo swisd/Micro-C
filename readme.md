@@ -3,7 +3,7 @@
 Micro-C is a minimalist, multi-target compiler written in Rust for a C-like systems programming language. It is designed to be small, understandable, and suitable for `no_std` environments (e.g., OS kernels or embedded systems).
 
 
-![](https://img.shields.io/badge/X86-functional-green)
+![](https://img.shields.io/badge/X86__64-functional-green)
 ![](https://img.shields.io/badge/WIN64-semi_functional-yellow)
 ![](https://img.shields.io/badge/ARM64-not%20working-red)
 
@@ -26,6 +26,7 @@ Micro-C is a minimalist, multi-target compiler written in Rust for a C-like syst
 - **Arithmetic**: Basic operations (`+`, `-`, `*`, `/`) and comparisons.
 - **Structs**: Basic structure definitions (WIP).
 - **Pointers**: `peek` and `poke` for direct memory access.
+- **Imports and externs**: `#include <Sys>` expands built-in declarations, and `extern fn name(args);` declares linker-provided functions.
 
 ## Architecture
 
@@ -55,6 +56,19 @@ export fn main() {
 
 let asm = compile(source, "x86_64");
 println!("{}", asm);
+```
+
+External functions can be declared and called like normal functions:
+
+```c
+#include <Sys>
+
+extern fn host_add(a, b);
+
+export fn main() {
+    let ptr = malloc(64);
+    return host_add(ptr, 1);
+}
 ```
 
 ## Project Structure

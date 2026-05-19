@@ -15,7 +15,7 @@ pub enum Token {
     Let, Fn, Return,
     If, Elif, Else,
     Loop, Break, Continue,
-    Export,
+    Export, Extern,
     Struct,
 
     Ident(String),
@@ -54,6 +54,7 @@ impl fmt::Display for Token {
             Token::Break => write!(f, "break"),
             Token::Continue => write!(f, "continue"),
             Token::Export => write!(f, "export"),
+            Token::Extern => write!(f, "extern"),
             Token::Struct => write!(f, "struct"),
 
             Token::Ident(name) => write!(f, "{}", name),
@@ -138,6 +139,7 @@ impl Lexer {
             "break" => Token::Break,
             "continue" => Token::Continue,
             "export" => Token::Export,
+            "extern" => Token::Extern,
             "struct" => Token::Struct,
             _ => Token::Ident(s),
         }

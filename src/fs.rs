@@ -12,6 +12,13 @@ use crate::error::error;
 ///
 /// Returns the file content as a String.
 pub fn open_file_or_lib(path: &str) -> String {
-    error(&format!("cant open file {}", path));
-    "".to_string()
+    match path {
+        "Sys" | "sys" => {
+            "extern fn printf(fmt, value);\nextern fn malloc(size);\nextern fn free(ptr);\n".to_string()
+        }
+        _ => {
+            error(&format!("cant open file {}", path));
+            "".to_string()
+        }
+    }
 }
