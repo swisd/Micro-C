@@ -57,7 +57,7 @@ export fn main() {
 let asm = compile(source, "x86_64");
 println!("{}", asm);
 ```
-
+## Syntax
 External functions can be declared and called like normal functions:
 
 ```c
