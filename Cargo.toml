@@ -6,3 +6,9 @@ edition = "2024"
 [dependencies]
 serde = { version = "1.0.228", features = ["derive"] }
 hashbrown = "0.17.0"
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen = { version = "0.2", default-features = false, features = ["alloc"] }
+
+[lib]
+crate-type = ["cdylib", "rlib"]
