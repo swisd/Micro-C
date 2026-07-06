@@ -11,4 +11,5 @@ hashbrown = "0.17.0"
 wasm-bindgen = { version = "0.2", default-features = false, features = ["alloc"] }
 
 [lib]
+name = "micro_c"
 crate-type = ["cdylib", "rlib"]
