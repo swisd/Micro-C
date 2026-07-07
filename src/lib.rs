@@ -1,5 +1,29 @@
 extern crate alloc;
-mod compiler; 
+
+mod lexer;
+mod parser;
+mod ast;
+mod interpreter;
+mod ir;
+mod codegen_ir;
+mod backend;
+mod regalloc;
+mod emitter;
+mod compiler;
+mod arch;
+mod stackframe;
+mod error;
+mod fs;
+
+use alloc::fmt::format;
+use alloc::format;
+// use std::{env, fs};
+// use std::fs::read_to_string;
+use lexer::Lexer;
+use parser::Parser;
+use interpreter::Interpreter;
+use crate::compiler::compile;
+use crate::error::print;
 
 
 #[cfg(target_arch = "wasm32")]
