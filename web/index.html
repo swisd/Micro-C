@@ -11,57 +11,140 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --primary-color: #667eea;
+            --primary-dark: #764ba2;
+            --success-color: #10b981;
+            --error-color: #ef4444;
+            --warning-color: #f59e0b;
+            --bg-dark: #1e1e1e;
+            --bg-light: #f5f5f5;
+            --text-dark: #1f2937;
+            --text-light: #d4d4d4;
+            --border-color: #e5e7eb;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
             min-height: 100vh;
             padding: 20px;
+            color: var(--text-dark);
         }
 
         .container {
-            max-width: 1400px;
+            max-width: 1600px;
             margin: 0 auto;
         }
 
+        /* Header Styles */
         header {
             text-align: center;
             color: white;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
+            animation: slideDown 0.6s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         h1 {
-            font-size: 2.5em;
+            font-size: 3em;
             margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+            font-weight: 800;
+            letter-spacing: -1px;
         }
 
         .subtitle {
-            font-size: 1.1em;
+            font-size: 1.2em;
+            opacity: 0.95;
+            margin-bottom: 20px;
+        }
+
+        .header-info {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            font-size: 0.95em;
             opacity: 0.9;
         }
 
+        .info-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        /* Layout */
         .editor-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 20px;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
         }
 
         .panel {
             background: white;
-            border-radius: 8px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             overflow: hidden;
             display: flex;
             flex-direction: column;
+            min-height: 500px;
+            animation: slideUp 0.6s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .panel-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
             color: white;
-            padding: 15px 20px;
-            font-weight: 600;
+            padding: 18px 24px;
+            font-weight: 700;
             font-size: 1.1em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .panel-header-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .panel-badge {
+            background: rgba(255, 255, 255, 0.3);
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
         }
 
         .panel-content {
@@ -75,52 +158,108 @@
         textarea {
             flex: 1;
             border: none;
-            padding: 15px;
-            font-family: 'Courier New', monospace;
+            padding: 16px;
+            font-family: 'Fira Code', 'Courier New', monospace;
             font-size: 14px;
+            line-height: 1.6;
             resize: none;
             outline: none;
+            background: white;
+            color: var(--text-dark);
         }
 
+        textarea::placeholder {
+            color: #b0b0b0;
+        }
+
+        #output {
+            background: var(--bg-dark);
+            color: var(--text-light);
+            font-family: 'Fira Code', 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        /* Controls */
         .controls {
             display: flex;
             gap: 10px;
-            padding: 15px 20px;
-            background: #f5f5f5;
-            border-top: 1px solid #e0e0e0;
+            padding: 16px 20px;
+            background: var(--bg-light);
+            border-top: 1px solid var(--border-color);
             flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .controls-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .controls-group.compact {
+            border-right: 1px solid var(--border-color);
+            padding-right: 10px;
         }
 
         select, button {
-            padding: 10px 15px;
+            padding: 10px 16px;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             font-size: 14px;
             cursor: pointer;
             transition: all 0.3s ease;
+            font-weight: 600;
         }
 
         select {
             background: white;
-            border: 1px solid #ddd;
-            color: #333;
+            border: 1.5px solid var(--border-color);
+            color: var(--text-dark);
+            min-width: 130px;
         }
 
         select:hover {
-            border-color: #667eea;
+            border-color: var(--primary-color);
+            background: #f9f9ff;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
         button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
             color: white;
             font-weight: 600;
-            flex-grow: 1;
-            min-width: 120px;
+            border: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        button:hover::before {
+            width: 300px;
+            height: 300px;
         }
 
         button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
         }
 
         button:active {
@@ -133,95 +272,252 @@
             transform: none;
         }
 
-        #output {
-            background: #1e1e1e;
-            color: #d4d4d4;
-            font-family: 'Courier New', monospace;
+        button.secondary {
+            background: white;
+            color: var(--primary-color);
+            border: 1.5px solid var(--primary-color);
+            flex-grow: 1;
+            min-width: 120px;
         }
 
+        button.secondary:hover {
+            background: #f0f4ff;
+        }
+
+        /* Examples */
+        .example-buttons {
+            display: flex;
+            gap: 10px;
+            padding: 12px 16px;
+            background: var(--bg-light);
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+        }
+
+        .example-btn {
+            padding: 8px 14px;
+            background: white;
+            color: var(--text-dark);
+            border: 1.5px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .example-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Status Messages */
         .status-message {
-            padding: 10px 15px;
-            border-top: 1px solid #e0e0e0;
-            font-size: 12px;
-            color: #666;
-            min-height: 20px;
+            padding: 12px 16px;
+            border-top: 1px solid var(--border-color);
+            font-size: 13px;
+            font-weight: 600;
+            min-height: 24px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
         }
 
-        .error {
-            background: #fee;
-            color: #c33;
+        .status-message.error {
+            background: #fee2e2;
+            color: var(--error-color);
         }
 
-        .success {
-            background: #efe;
-            color: #3c3;
+        .status-message.success {
+            background: #ecfdf5;
+            color: var(--success-color);
         }
 
+        .status-message.warning {
+            background: #fef3c7;
+            color: var(--warning-color);
+        }
+
+        .status-message.info {
+            background: #eff6ff;
+            color: var(--primary-color);
+        }
+
+        /* Loading Spinner */
         .loading {
             display: inline-block;
-            width: 12px;
-            height: 12px;
-            border: 2px solid #667eea;
+            width: 14px;
+            height: 14px;
+            border: 2px solid currentColor;
             border-top-color: transparent;
             border-radius: 50%;
-            animation: spin 0.6s linear infinite;
+            animation: spin 0.8s linear infinite;
         }
 
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
 
+        /* Utility */
+        .char-count {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .divider {
+            width: 1px;
+            height: 24px;
+            background: var(--border-color);
+            margin: 0 5px;
+        }
+
+        /* Footer Info */
+        .footer-info {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-top: 20px;
+        }
+
+        .footer-info h3 {
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .footer-info p {
+            font-size: 0.95em;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+
+        .footer-info a {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.5);
+            transition: border-color 0.3s;
+        }
+
+        .footer-info a:hover {
+            border-bottom-color: white;
+        }
+
+        /* Responsive */
         @media (max-width: 1024px) {
             .editor-container {
                 grid-template-columns: 1fr;
             }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .controls-group.compact {
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+                padding-right: 0;
+                padding-bottom: 10px;
+            }
         }
 
-        .panel {
-            min-height: 400px;
+        @media (max-width: 640px) {
+            body {
+                padding: 10px;
+            }
+
+            header {
+                margin-bottom: 25px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .header-info {
+                gap: 10px;
+                font-size: 0.85em;
+            }
+
+            .example-buttons {
+                gap: 8px;
+            }
+
+            .example-btn {
+                padding: 6px 10px;
+                font-size: 12px;
+                flex: 1;
+                min-width: 0;
+            }
+
+            .panel {
+                min-height: 350px;
+            }
+
+            textarea {
+                font-size: 13px;
+            }
+
+            button {
+                padding: 10px 12px;
+                font-size: 13px;
+            }
+
+            select {
+                min-width: 110px;
+                font-size: 13px;
+            }
         }
 
-        .example-buttons {
-            display: flex;
-            gap: 10px;
-            padding: 10px 20px;
-            background: #f5f5f5;
-            border-bottom: 1px solid #e0e0e0;
-            flex-wrap: wrap;
-        }
-
-        .example-btn {
-            padding: 8px 12px;
-            background: grey;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-            transition: all 0.2s;
-        }
-
-        .example-btn:hover {
-            background: #667eea;
-            color: white;
-            border-color: #667eea;
-        }
+        /* Syntax Highlighting for Output */
+        .keyword { color: #87ceeb; }
+        .register { color: #ff79c6; }
+        .number { color: #bd93f9; }
+        .comment { color: #6272a4; }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>Micro-C Online Compiler</h1>
-            <p class="subtitle">Compile Micro-C code to multiple architectures</p>
+            <h1>🚀 Micro-C Online Compiler</h1>
+            <p class="subtitle">Compile systems programming code to multiple architectures</p>
+            <div class="header-info">
+                <div class="info-badge">📝 C-like Syntax</div>
+                <div class="info-badge">🔧 Multi-Target</div>
+                <div class="info-badge">⚡ Real-time Compilation</div>
+            </div>
         </header>
 
         <div class="editor-container">
             <!-- Source Code Panel -->
             <div class="panel">
-                <div class="panel-header">Source Code</div>
+                <div class="panel-header">
+                    <div class="panel-header-info">
+                        <span>Source Code</span>
+                        <span class="panel-badge">Micro-C</span>
+                    </div>
+                    <div style="margin-left: auto;">
+                        <span class="char-count"><span id="charCount">0</span> chars</span>
+                    </div>
+                </div>
                 <div class="example-buttons">
-                    <button class="example-btn" onclick="loadExample('simple')">Simple Function</button>
-                    <button class="example-btn" onclick="loadExample('sys')">With Sys Include</button>
-                    <button class="example-btn" onclick="loadExample('fibonacci')">Fibonacci</button>
+                    <button class="example-btn" onclick="loadExample('simple')">📐 Simple Function</button>
+                    <button class="example-btn" onclick="loadExample('sys')">🔗 With Sys Include</button>
+                    <button class="example-btn" onclick="loadExample('fibonacci')">📊 Fibonacci</button>
+                    <button class="example-btn" onclick="loadExample('struct')">🏗️ Structs</button>
+                    <button class="example-btn" onclick="loadExample('memory')">💾 Memory Ops</button>
                 </div>
                 <div class="panel-content">
                     <textarea id="source" placeholder="Enter your Micro-C code here...">export fn main() {
@@ -229,27 +525,50 @@
 }</textarea>
                 </div>
                 <div class="controls">
-                    <select id="architecture">
-                        <option value="x86_64">x86_64 (Raw)</option>
-                        <option value="win64">Windows x64</option>
-                        <option value="arm64">ARM64</option>
-                    </select>
-                    <button onclick="compile()">Compile</button>
+                    <div class="controls-group compact">
+                        <label for="architecture" style="font-weight: 600; margin-right: 8px;">Architecture:</label>
+                        <select id="architecture">
+                            <option value="x86_64">x86_64 (Raw Assembly)</option>
+                            <option value="win64">Windows x64 ABI</option>
+                            <option value="arm64">ARM64 / AArch64</option>
+                        </select>
+                    </div>
+                    <button onclick="compile()" style="flex-grow: 1; min-width: 140px;">
+                        <span id="compileText">▶ Compile</span>
+                    </button>
                 </div>
             </div>
 
             <!-- Output Panel -->
             <div class="panel">
-                <div class="panel-header">Assembly Output</div>
+                <div class="panel-header">
+                    <div class="panel-header-info">
+                        <span>Assembly Output</span>
+                        <span class="panel-badge" id="outputBadge">Ready</span>
+                    </div>
+                </div>
                 <div class="panel-content">
                     <textarea id="output" readonly placeholder="Compiled assembly will appear here..."></textarea>
                 </div>
                 <div class="controls">
-                    <button onclick="copyToClipboard()">Copy Output</button>
-                    <button onclick="clearOutput()">Clear</button>
+                    <div class="controls-group">
+                        <button class="secondary" onclick="copyToClipboard()" style="margin-right: 5px;">📋 Copy</button>
+                        <button class="secondary" onclick="downloadOutput()" style="margin-right: 5px;">⬇️ Download</button>
+                    </div>
+                    <div class="divider"></div>
+                    <button class="secondary" onclick="clearOutput()" style="margin-left: 5px;">🗑️ Clear</button>
                 </div>
-                <div class="status-message" id="status"></div>
+                <div class="status-message info" id="status">
+                    <span class="loading" id="loadingSpinner" style="display: none;"></span>
+                    <span id="statusText">Ready to compile</span>
+                </div>
             </div>
+        </div>
+
+        <div class="footer-info">
+            <h3>ℹ️ About Micro-C</h3>
+            <p>Micro-C is a minimalist, multi-target compiler for systems programming. Learn more at <a href="https://github.com/swisd/Micro-C" target="_blank">GitHub</a></p>
+            <p>Supported targets: <strong>x86_64</strong> (functional), <strong>Windows x64</strong> (semi-functional), <strong>ARM64</strong> (in progress)</p>
         </div>
     </div>
 
@@ -261,17 +580,24 @@
         // Initialize WASM module
         init().then(() => {
             wasmReady = true;
-            console.log("WASM module loaded successfully");
+            console.log("✓ WASM module loaded successfully");
             updateStatus("Ready to compile", "success");
+            document.getElementById('outputBadge').textContent = "Ready";
         }).catch(err => {
-            console.error("Failed to load WASM module:", err);
+            console.error("✗ Failed to load WASM module:", err);
             updateStatus("Error loading compiler: " + err, "error");
+            document.getElementById('outputBadge').textContent = "Error";
+        });
+
+        // Character count tracker
+        document.getElementById('source').addEventListener('input', function() {
+            document.getElementById('charCount').textContent = this.value.length;
         });
 
         // Make functions globally available
         window.compile = function() {
             if (!wasmReady) {
-                updateStatus("Compiler not ready yet...", "error");
+                updateStatus("⏳ Compiler not ready yet...", "warning");
                 return;
             }
 
@@ -279,38 +605,65 @@
             const arch = document.getElementById('architecture').value;
             
             if (!source.trim()) {
-                updateStatus("Error: No source code provided", "error");
+                updateStatus("⚠️ Error: No source code provided", "error");
                 return;
             }
 
-            const btn = event.target;
-            const originalText = btn.textContent;
+            const btn = event.target.closest('button');
+            const originalText = btn.innerHTML;
             btn.disabled = true;
             btn.innerHTML = '<span class="loading"></span> Compiling...';
+            
+            showLoadingSpinner(true);
 
             try {
                 const output = compile_from_web(source, arch);
                 document.getElementById('output').value = output;
+                document.getElementById('outputBadge').textContent = arch;
                 updateStatus(`✓ Compiled successfully for ${arch}`, "success");
             } catch (err) {
-                document.getElementById('output').value = `Compilation Error: ${err}`;
+                document.getElementById('output').value = `Compilation Error:\n\n${err}`;
+                document.getElementById('outputBadge').textContent = "Error";
                 updateStatus(`✗ Compilation failed: ${err}`, "error");
             } finally {
                 btn.disabled = false;
-                btn.textContent = originalText;
+                btn.innerHTML = originalText;
+                showLoadingSpinner(false);
             }
         };
 
         window.copyToClipboard = function() {
             const output = document.getElementById('output');
+            if (!output.value.trim()) {
+                updateStatus("ℹ️ Nothing to copy", "info");
+                return;
+            }
             output.select();
             document.execCommand('copy');
             updateStatus("✓ Copied to clipboard", "success");
         };
 
+        window.downloadOutput = function() {
+            const output = document.getElementById('output').value;
+            if (!output.trim()) {
+                updateStatus("ℹ️ Nothing to download", "info");
+                return;
+            }
+            const arch = document.getElementById('architecture').value;
+            const element = document.createElement("a");
+            element.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(output));
+            element.setAttribute("download", `output_${arch}.asm`);
+            element.style.display = "none";
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+            updateStatus("✓ Downloaded assembly file", "success");
+        };
+
         window.clearOutput = function() {
             document.getElementById('output').value = '';
-            updateStatus("Output cleared", "");
+            document.getElementById('outputBadge').textContent = "Ready";
+            updateStatus("Output cleared", "info");
         };
 
         window.loadExample = function(type) {
@@ -325,7 +678,8 @@ export fn main() {
                 sys: `#include <Sys>
 
 export fn main() {
-    return malloc(256);
+    let buffer = malloc(256);
+    return 0;
 }`,
                 fibonacci: `fn fib(n) {
     if (n <= 1) {
@@ -336,17 +690,57 @@ export fn main() {
 
 export fn main() {
     return fib(10);
+}`,
+                struct: `struct Point {
+    x: i64;
+    y: i64;
+}
+
+fn distance_sq(p) {
+    return p.x * p.x + p.y * p.y;
+}
+
+export fn main() {
+    let p: ptr = alloc_struct(Point);
+    p.x = 3;
+    p.y = 4;
+    return distance_sq(p);
+}`,
+                memory: `#include <Sys>
+
+export fn main() {
+    let ptr = malloc(64);
+    poke(ptr, 42);
+    let value = peek(ptr);
+    
+    let arr = malloc(100);
+    arr[0] = 10;
+    arr[1] = 20;
+    return arr[0] + arr[1];
 }`
             };
-            document.getElementById('source').value = examples[type] || examples.simple;
-            updateStatus("Example loaded", "");
+            const code = examples[type] || examples.simple;
+            document.getElementById('source').value = code;
+            document.getElementById('charCount').textContent = code.length;
+            updateStatus(`✓ Example loaded: ${type}`, "success");
+            document.getElementById('output').value = '';
+            document.getElementById('outputBadge').textContent = "Ready";
         };
 
         function updateStatus(message, type) {
             const status = document.getElementById('status');
-            status.textContent = message;
+            const statusText = document.getElementById('statusText');
+            statusText.textContent = message;
             status.className = 'status-message ' + type;
         }
+
+        function showLoadingSpinner(show) {
+            const spinner = document.getElementById('loadingSpinner');
+            spinner.style.display = show ? 'inline-block' : 'none';
+        }
+
+        // Initialize character count
+        document.getElementById('charCount').textContent = document.getElementById('source').value.length;
     </script>
 </body>
 </html>
