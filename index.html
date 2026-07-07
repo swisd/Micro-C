@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Micro-C Online Compiler</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .subtitle {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .editor-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .panel {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 20px;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        .panel-content {
+            flex: 1;
+            padding: 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        textarea {
+            flex: 1;
+            border: none;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            resize: none;
+            outline: none;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            padding: 15px 20px;
+            background: #f5f5f5;
+            border-top: 1px solid #e0e0e0;
+            flex-wrap: wrap;
+        }
+
+        select, button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        select {
+            background: white;
+            border: 1px solid #ddd;
+            color: #333;
+        }
+
+        select:hover {
+            border-color: #667eea;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 600;
+            flex-grow: 1;
+            min-width: 120px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        #output {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            font-family: 'Courier New', monospace;
+        }
+
+        .status-message {
+            padding: 10px 15px;
+            border-top: 1px solid #e0e0e0;
+            font-size: 12px;
+            color: #666;
+            min-height: 20px;
+        }
+
+        .error {
+            background: #fee;
+            color: #c33;
+        }
+
+        .success {
+            background: #efe;
+            color: #3c3;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid #667eea;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 1024px) {
+            .editor-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            min-height: 400px;
+        }
+
+        .example-buttons {
+            display: flex;
+            gap: 10px;
+            padding: 10px 20px;
+            background: #f5f5f5;
+            border-bottom: 1px solid #e0e0e0;
+            flex-wrap: wrap;
+        }
+
+        .example-btn {
+            padding: 8px 12px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        .example-btn:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔧 Micro-C Online Compiler</h1>
+            <p class="subtitle">Compile Micro-C code to multiple architectures</p>
+        </header>
+
+        <div class="editor-container">
+            <!-- Source Code Panel -->
+            <div class="panel">
+                <div class="panel-header">Source Code</div>
+                <div class="example-buttons">
+                    <button class="example-btn" onclick="loadExample('simple')">Simple Function</button>
+                    <button class="example-btn" onclick="loadExample('sys')">With Sys Include</button>
+                    <button class="example-btn" onclick="loadExample('fibonacci')">Fibonacci</button>
+                </div>
+                <div class="panel-content">
+                    <textarea id="source" placeholder="Enter your Micro-C code here...">export fn main() {
+    return 42;
+}</textarea>
+                </div>
+                <div class="controls">
+                    <select id="architecture">
+                        <option value="x86_64">x86_64 (Raw)</option>
+                        <option value="win64">Windows x64</option>
+                        <option value="arm64">ARM64</option>
+                    </select>
+                    <button onclick="compile()">Compile</button>
+                </div>
+            </div>
+
+            <!-- Output Panel -->
+            <div class="panel">
+                <div class="panel-header">Assembly Output</div>
+                <div class="panel-content">
+                    <textarea id="output" readonly placeholder="Compiled assembly will appear here..."></textarea>
+                </div>
+                <div class="controls">
+                    <button onclick="copyToClipboard()">Copy Output</button>
+                    <button onclick="clearOutput()">Clear</button>
+                </div>
+                <div class="status-message" id="status"></div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import init, { compile_from_web } from './pkg/micro_c.js';
+
+        let wasmReady = false;
+
+        // Initialize WASM module
+        init().then(() => {
+            wasmReady = true;
+            console.log("WASM module loaded successfully");
+            updateStatus("Ready to compile", "success");
+        }).catch(err => {
+            console.error("Failed to load WASM module:", err);
+            updateStatus("Error loading compiler: " + err, "error");
+        });
+
+        // Make functions globally available
+        window.compile = function() {
+            if (!wasmReady) {
+                updateStatus("Compiler not ready yet...", "error");
+                return;
+            }
+
+            const source = document.getElementById('source').value;
+            const arch = document.getElementById('architecture').value;
+            
+            if (!source.trim()) {
+                updateStatus("Error: No source code provided", "error");
+                return;
+            }
+
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading"></span> Compiling...';
+
+            try {
+                const output = compile_from_web(source, arch);
+                document.getElementById('output').value = output;
+                updateStatus(`✓ Compiled successfully for ${arch}`, "success");
+            } catch (err) {
+                document.getElementById('output').value = `Compilation Error: ${err}`;
+                updateStatus(`✗ Compilation failed: ${err}`, "error");
+            } finally {
+                btn.disabled = false;
+                btn.textContent = originalText;
+            }
+        };
+
+        window.copyToClipboard = function() {
+            const output = document.getElementById('output');
+            output.select();
+            document.execCommand('copy');
+            updateStatus("✓ Copied to clipboard", "success");
+        };
+
+        window.clearOutput = function() {
+            document.getElementById('output').value = '';
+            updateStatus("Output cleared", "");
+        };
+
+        window.loadExample = function(type) {
+            const examples = {
+                simple: `fn add(a, b) {
+    return a + b;
+}
+
+export fn main() {
+    return add(10, 5);
+}`,
+                sys: `#include <Sys>
+
+export fn main() {
+    return malloc(256);
+}`,
+                fibonacci: `fn fib(n) {
+    if (n <= 1) {
+        return n;
+    }
+    return fib(n - 1) + fib(n - 2);
+}
+
+export fn main() {
+    return fib(10);
+}`
+            };
+            document.getElementById('source').value = examples[type] || examples.simple;
+            updateStatus("Example loaded", "");
+        };
+
+        function updateStatus(message, type) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = 'status-message ' + type;
+        }
+    </script>
+</body>
+</html>
