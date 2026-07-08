@@ -136,7 +136,7 @@ impl IRGenerator {
 
             Stmt::Import { .. } => {}
 
-            _ => {error(&format!("{:#X} Stmt {:?}", self.position, stmt));}
+            _ => {error(&format!("@IR:{:#X} Stmt {:?}", self.position, stmt));}
         }
     }
 
@@ -188,7 +188,7 @@ impl IRGenerator {
                 out
             }
 
-            _ => {error(&format!("{:#X} Expr {:?}", self.position, expr)); String::new()}
+            _ => {error(&format!("@IR:{:#X} Expr {:?}", self.position, expr)); String::new()}
         }
     }
 }
