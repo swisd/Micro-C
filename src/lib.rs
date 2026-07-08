@@ -37,3 +37,15 @@ pub fn compile_from_web(source_code: &str, target_arch: &str) -> String {
         assembly => assembly
     }
 }
+
+#[cfg(target_arch = "wasm32")]
+#[wasm_bindgen]
+pub fn init_errors() {
+    crate::error::init_errors();
+}
+
+#[cfg(target_arch = "wasm32")]
+#[wasm_bindgen]
+pub fn get_errors() -> Vec<String> {
+    crate::error::get_errors()
+}
