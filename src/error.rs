@@ -2,6 +2,8 @@
 //!
 //! This module provides functions for reporting compilation errors
 //! and printing messages in a `no_std` environment.
+#![allow(static_mut_refs)]
+
 
 use alloc::format;
 use alloc::string::{String, ToString};
