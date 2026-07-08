@@ -49,3 +49,9 @@ pub fn init_errors() {
 pub fn get_errors() -> Vec<String> {
     crate::error::get_errors()
 }
+
+#[cfg(target_arch = "wasm32")]
+#[wasm_bindgen]
+pub fn clear_errors() {
+    crate::error::clear_errors();
+}
