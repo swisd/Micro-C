@@ -682,7 +682,7 @@
                 </div>
                 <div class="panel-content">
                     <textarea id="source" placeholder="Enter your Micro-C code here...">export fn main() {
-    return 42;
+     return 42;
 }</textarea>
                 </div>
                 <div class="controls">
@@ -750,14 +750,14 @@
 
         <div class="footer-info">
             <h3>About Micro-C</h3>
-            <p>Micro-C is a minimalist, multi-target compiler written in Rust for a C-like systems programming language. It is designed for custom operating systems, UEFI applications, and embedd[...]
+            <p>Micro-C is a minimalist, multi-target compiler written in Rust for a C-like systems programming language. It is designed for custom operating systems, UEFI applications, and embedded systems.</p>
             <p>Supported targets: <strong>x86_64</strong> (functional), <strong>Windows x64</strong> (semi-functional), <strong>ARM64</strong> (in development)</p>
             <p>Learn more: <a href="https://github.com/swisd/Micro-C" target="_blank">GitHub Repository</a></p>
         </div>
     </div>
 
     <script type="module">
-        import init, { compile_from_web } from './pkg/micro_c.js';
+        import init, { compile_from_web, init_errors, get_errors } from './pkg/micro_c.js';
 
         let wasmReady = false;
 
@@ -806,20 +806,25 @@
             showLoadingSpinner(true);
 
             try {
+                // Initialize errors before compilation
+                init_errors();
+                
                 const output = compile_from_web(source, arch);
                 
-                // Check if output contains error information
-                const hasErrors = output.toLowerCase().includes('error') || output.toLowerCase().includes('compilation error');
+                // Retrieve all errors from the static array
+                const errors = get_errors();
+                
+                // Check if compilation was successful
+                const hasErrors = errors.length > 0;
                 
                 document.getElementById('output').value = output;
                 document.getElementById('outputBadge').textContent = arch;
                 
-                // Parse and display errors/warnings
-                const errorLines = parseErrorsFromOutput(output);
-                displayErrors(errorLines);
+                // Display errors from the static array
+                displayErrorsFromArray(errors);
                 
-                if (hasErrors || errorLines.length > 0) {
-                    updateStatus("Compilation completed with errors", "error");
+                if (hasErrors) {
+                    updateStatus(`Compilation completed with ${errors.length} error(s)`, "error");
                     updateStatusIndicator("error");
                 } else {
                     updateStatus("Successfully compiled for " + arch, "success");
@@ -886,54 +891,54 @@
         window.loadExample = function(type) {
             const examples = {
                 simple: `fn add(a, b) {
-    return a + b;
+     return a + b;
 }
 
 export fn main() {
-    return add(10, 5);
+     return add(10, 5);
 }`,
                 sys: `#include <Sys>
 
 export fn main() {
-    let buffer = malloc(256);
-    return 0;
+     let buffer = malloc(256);
+     return 0;
 }`,
                 fibonacci: `fn fib(n) {
-    if (n <= 1) {
-        return n;
-    }
-    return fib(n - 1) + fib(n - 2);
+     if (n <= 1) {
+         return n;
+     }
+     return fib(n - 1) + fib(n - 2);
 }
 
 export fn main() {
-    return fib(10);
+     return fib(10);
 }`,
                 struct: `struct Point {
-    x: i64;
-    y: i64;
+     x: i64;
+     y: i64;
 }
 
 fn distance_sq(p) {
-    return p.x * p.x + p.y * p.y;
+     return p.x * p.x + p.y * p.y;
 }
 
 export fn main() {
-    let p: ptr = alloc_struct(Point);
-    p.x = 3;
-    p.y = 4;
-    return distance_sq(p);
+     let p: ptr = alloc_struct(Point);
+     p.x = 3;
+     p.y = 4;
+     return distance_sq(p);
 }`,
                 memory: `#include <Sys>
 
 export fn main() {
-    let ptr = malloc(64);
-    poke(ptr, 42);
-    let value = peek(ptr);
-    
-    let arr = malloc(100);
-    arr[0] = 10;
-    arr[1] = 20;
-    return arr[0] + arr[1];
+     let ptr = malloc(64);
+     poke(ptr, 42);
+     let value = peek(ptr);
+     
+     let arr = malloc(100);
+     arr[0] = 10;
+     arr[1] = 20;
+     return arr[0] + arr[1];
 }`
             };
             const code = examples[type] || examples.simple;
@@ -946,22 +951,29 @@ export fn main() {
             clearErrors();
         };
 
-        function parseErrorsFromOutput(output) {
-            // Simple error parsing - this can be enhanced based on your compiler's output format
-            const lines = output.split('\n');
-            const errors = [];
+        function displayErrorsFromArray(errors) {
+            const errorsDiv = document.getElementById('errors');
             
-            for (let i = 0; i < lines.length; i++) {
-                const line = lines[i].trim();
-                if (line.toLowerCase().includes('error:') || line.toLowerCase().includes('warning:')) {
-                    errors.push({
-                        type: line.toLowerCase().includes('error:') ? 'Error' : 'Warning',
-                        message: line
-                    });
-                }
+            if (errors.length === 0) {
+                errorsDiv.innerHTML = '<div class="error-empty">No errors or warnings</div>';
+                document.getElementById('errorBadge').textContent = "None";
+                return;
             }
             
-            return errors;
+            errorsDiv.innerHTML = '';
+            
+            errors.forEach(errorMsg => {
+                const entry = document.createElement('div');
+                entry.className = 'error-entry';
+                entry.innerHTML = `
+                    <div class="error-type">ERROR</div>
+                    <div class="error-message">${escapeHtml(errorMsg)}</div>
+                `;
+                errorsDiv.appendChild(entry);
+            });
+            
+            document.getElementById('errorBadge').textContent = errors.length;
+            updateErrorBadge();
         }
 
         function displayErrorMessage(message, type) {
@@ -979,58 +991,24 @@ export fn main() {
             updateErrorBadge();
         }
 
-        function displayErrors(errors) {
-            const errorsDiv = document.getElementById('errors');
-            
-            if (errors.length === 0) {
-                errorsDiv.innerHTML = '<div class="error-empty">No errors or warnings</div>';
-                document.getElementById('errorBadge').textContent = "None";
-                return;
-            }
-            
-            errorsDiv.innerHTML = '';
-            
-            errors.forEach(error => {
-                const entry = document.createElement('div');
-                entry.className = 'error-entry';
-                entry.innerHTML = `
-                    <div class="error-type">${error.type}</div>
-                    <div class="error-message">${escapeHtml(error.message)}</div>
-                `;
-                errorsDiv.appendChild(entry);
-            });
-            
-            updateErrorBadge();
-        }
-
-        function updateErrorBadge() {
-            const errorsDiv = document.getElementById('errors');
-            const isEmpty = errorsDiv.textContent.includes('No errors or warnings');
-            
-            if (isEmpty) {
-                document.getElementById('errorBadge').textContent = "None";
-            } else {
-                const errorCount = document.querySelectorAll('.error-entry').length;
-                document.getElementById('errorBadge').textContent = errorCount + (errorCount === 1 ? ' Issue' : ' Issues');
-            }
-        }
-
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
         function updateStatus(message, type) {
-            const status = document.getElementById('status');
+            const statusElement = document.getElementById('status');
             const statusText = document.getElementById('statusText');
+            
+            // Remove all type classes
+            statusElement.classList.remove('error', 'success', 'warning', 'info');
+            
+            // Add the new type class
+            statusElement.classList.add(type);
+            
+            // Update the text
             statusText.textContent = message;
-            status.className = 'status-message ' + type;
         }
 
-        function updateStatusIndicator(state) {
+        function updateStatusIndicator(status) {
             const indicator = document.getElementById('statusIndicator');
-            indicator.className = 'status-indicator ' + state;
+            indicator.classList.remove('ready', 'error', 'compiling');
+            indicator.classList.add(status);
         }
 
         function showLoadingSpinner(show) {
@@ -1038,11 +1016,15 @@ export fn main() {
             spinner.style.display = show ? 'inline-block' : 'none';
         }
 
-        // Make clearErrors globally available
-        window.clearErrors = clearErrors;
+        function updateErrorBadge() {
+            // Badge is updated in displayErrorsFromArray
+        }
 
-        // Initialize character count
-        document.getElementById('charCount').textContent = document.getElementById('source').value.length;
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
     </script>
 </body>
 </html>
