@@ -128,6 +128,30 @@
             }
         }
 
+        .output-container {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .output-panel {
+            background: white;
+            border-radius: 10px;
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            animation: slideUp 0.6s ease;
+        }
+
+        .output-panel.assembly {
+            min-height: 300px;
+        }
+
+        .output-panel.errors {
+            min-height: 200px;
+        }
+
         .panel-header {
             background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
             color: white;
@@ -153,6 +177,21 @@
             font-size: 0.75em;
             font-weight: 600;
             letter-spacing: 0.5px;
+        }
+
+        .panel-badge.error {
+            background: rgba(239, 68, 68, 0.3);
+            color: #fee2e2;
+        }
+
+        .panel-badge.warning {
+            background: rgba(245, 158, 11, 0.3);
+            color: #fef3c7;
+        }
+
+        .panel-badge.success {
+            background: rgba(16, 185, 129, 0.3);
+            color: #d1fae5;
         }
 
         .panel-content {
@@ -186,6 +225,45 @@
             font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
             font-size: 13px;
             line-height: 1.5;
+        }
+
+        #errors {
+            background: #fef2f2;
+            color: #1f2937;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            padding: 16px;
+            overflow-y: auto;
+        }
+
+        .error-entry {
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #fecaca;
+        }
+
+        .error-entry:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .error-type {
+            font-weight: 700;
+            color: #991b1b;
+            margin-bottom: 4px;
+        }
+
+        .error-message {
+            color: #7f1d1d;
+            margin-bottom: 2px;
+        }
+
+        .error-empty {
+            color: #9ca3af;
+            font-style: italic;
+            padding: 16px;
         }
 
         /* Controls */
@@ -488,6 +566,14 @@
                 min-height: 400px;
             }
 
+            .output-panel.assembly {
+                min-height: 250px;
+            }
+
+            .output-panel.errors {
+                min-height: 150px;
+            }
+
             .editor-container {
                 gap: 16px;
                 margin-bottom: 24px;
@@ -614,25 +700,46 @@
                 </div>
             </div>
 
-            <!-- Output Panel -->
-            <div class="panel">
-                <div class="panel-header">
-                    <div class="panel-header-info">
-                        <span>Assembly Output</span>
-                        <span class="panel-badge" id="outputBadge">Ready</span>
+            <!-- Output Panels Container -->
+            <div class="output-container">
+                <!-- Assembly Output Panel -->
+                <div class="output-panel assembly">
+                    <div class="panel-header">
+                        <div class="panel-header-info">
+                            <span>Assembly Output</span>
+                            <span class="panel-badge" id="outputBadge">Ready</span>
+                        </div>
+                    </div>
+                    <div class="panel-content">
+                        <textarea id="output" readonly placeholder="Compiled assembly will appear here..."></textarea>
+                    </div>
+                    <div class="controls">
+                        <div class="controls-group">
+                            <button class="secondary" onclick="copyToClipboard()">Copy</button>
+                            <button class="secondary" onclick="downloadOutput()">Download</button>
+                        </div>
+                        <div class="divider"></div>
+                        <button class="secondary" onclick="clearOutput()">Clear</button>
                     </div>
                 </div>
-                <div class="panel-content">
-                    <textarea id="output" readonly placeholder="Compiled assembly will appear here..."></textarea>
-                </div>
-                <div class="controls">
-                    <div class="controls-group">
-                        <button class="secondary" onclick="copyToClipboard()">Copy</button>
-                        <button class="secondary" onclick="downloadOutput()">Download</button>
+
+                <!-- Errors/Warnings Panel -->
+                <div class="output-panel errors">
+                    <div class="panel-header">
+                        <div class="panel-header-info">
+                            <span>Errors & Warnings</span>
+                            <span class="panel-badge" id="errorBadge">None</span>
+                        </div>
                     </div>
-                    <div class="divider"></div>
-                    <button class="secondary" onclick="clearOutput()">Clear</button>
+                    <div class="panel-content">
+                        <div id="errors" class="error-empty">No errors or warnings</div>
+                    </div>
+                    <div class="controls">
+                        <button class="secondary" onclick="clearErrors()" style="flex-grow: 1;">Clear</button>
+                    </div>
                 </div>
+
+                <!-- Overall Status -->
                 <div class="status-message info" id="status">
                     <span class="status-indicator ready" id="statusIndicator"></span>
                     <span class="loading" id="loadingSpinner" style="display: none; margin-right: 4px;"></span>
@@ -643,7 +750,7 @@
 
         <div class="footer-info">
             <h3>About Micro-C</h3>
-            <p>Micro-C is a minimalist, multi-target compiler written in Rust for a C-like systems programming language. It is designed for custom operating systems, UEFI applications, and embedded environments.</p>
+            <p>Micro-C is a minimalist, multi-target compiler written in Rust for a C-like systems programming language. It is designed for custom operating systems, UEFI applications, and embedd[...]
             <p>Supported targets: <strong>x86_64</strong> (functional), <strong>Windows x64</strong> (semi-functional), <strong>ARM64</strong> (in development)</p>
             <p>Learn more: <a href="https://github.com/swisd/Micro-C" target="_blank">GitHub Repository</a></p>
         </div>
@@ -700,13 +807,32 @@
 
             try {
                 const output = compile_from_web(source, arch);
+                
+                // Check if output contains error information
+                const hasErrors = output.toLowerCase().includes('error') || output.toLowerCase().includes('compilation error');
+                
                 document.getElementById('output').value = output;
                 document.getElementById('outputBadge').textContent = arch;
-                updateStatus("Successfully compiled for " + arch, "success");
-                updateStatusIndicator("ready");
+                
+                // Parse and display errors/warnings
+                const errorLines = parseErrorsFromOutput(output);
+                displayErrors(errorLines);
+                
+                if (hasErrors || errorLines.length > 0) {
+                    updateStatus("Compilation completed with errors", "error");
+                    updateStatusIndicator("error");
+                } else {
+                    updateStatus("Successfully compiled for " + arch, "success");
+                    updateStatusIndicator("ready");
+                }
             } catch (err) {
-                document.getElementById('output').value = "Compilation Error:\n\n" + err;
+                const errorOutput = "Compilation Error:\n\n" + err;
+                document.getElementById('output').value = errorOutput;
                 document.getElementById('outputBadge').textContent = "Error";
+                
+                // Display the error in the errors panel
+                displayErrorMessage(err.toString(), "error");
+                
                 updateStatus("Compilation failed: " + err, "error");
                 updateStatusIndicator("error");
             } finally {
@@ -749,6 +875,12 @@
             document.getElementById('outputBadge').textContent = "Ready";
             updateStatus("Output cleared", "info");
             updateStatusIndicator("ready");
+        };
+
+        window.clearErrors = function() {
+            const errorsDiv = document.getElementById('errors');
+            errorsDiv.innerHTML = '<div class="error-empty">No errors or warnings</div>';
+            document.getElementById('errorBadge').textContent = "None";
         };
 
         window.loadExample = function(type) {
@@ -811,7 +943,83 @@ export fn main() {
             document.getElementById('output').value = '';
             document.getElementById('outputBadge').textContent = "Ready";
             updateStatusIndicator("ready");
+            clearErrors();
         };
+
+        function parseErrorsFromOutput(output) {
+            // Simple error parsing - this can be enhanced based on your compiler's output format
+            const lines = output.split('\n');
+            const errors = [];
+            
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (line.toLowerCase().includes('error:') || line.toLowerCase().includes('warning:')) {
+                    errors.push({
+                        type: line.toLowerCase().includes('error:') ? 'Error' : 'Warning',
+                        message: line
+                    });
+                }
+            }
+            
+            return errors;
+        }
+
+        function displayErrorMessage(message, type) {
+            const errorsDiv = document.getElementById('errors');
+            errorsDiv.innerHTML = '';
+            
+            const entry = document.createElement('div');
+            entry.className = 'error-entry';
+            entry.innerHTML = `
+                <div class="error-type">${type.toUpperCase()}</div>
+                <div class="error-message">${escapeHtml(message)}</div>
+            `;
+            
+            errorsDiv.appendChild(entry);
+            updateErrorBadge();
+        }
+
+        function displayErrors(errors) {
+            const errorsDiv = document.getElementById('errors');
+            
+            if (errors.length === 0) {
+                errorsDiv.innerHTML = '<div class="error-empty">No errors or warnings</div>';
+                document.getElementById('errorBadge').textContent = "None";
+                return;
+            }
+            
+            errorsDiv.innerHTML = '';
+            
+            errors.forEach(error => {
+                const entry = document.createElement('div');
+                entry.className = 'error-entry';
+                entry.innerHTML = `
+                    <div class="error-type">${error.type}</div>
+                    <div class="error-message">${escapeHtml(error.message)}</div>
+                `;
+                errorsDiv.appendChild(entry);
+            });
+            
+            updateErrorBadge();
+        }
+
+        function updateErrorBadge() {
+            const errorsDiv = document.getElementById('errors');
+            const isEmpty = errorsDiv.textContent.includes('No errors or warnings');
+            
+            if (isEmpty) {
+                document.getElementById('errorBadge').textContent = "None";
+            } else {
+                const errorCount = document.querySelectorAll('.error-entry').length;
+                document.getElementById('errorBadge').textContent = errorCount + (errorCount === 1 ? ' Issue' : ' Issues');
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
 
         function updateStatus(message, type) {
             const status = document.getElementById('status');
@@ -829,6 +1037,9 @@ export fn main() {
             const spinner = document.getElementById('loadingSpinner');
             spinner.style.display = show ? 'inline-block' : 'none';
         }
+
+        // Make clearErrors globally available
+        window.clearErrors = clearErrors;
 
         // Initialize character count
         document.getElementById('charCount').textContent = document.getElementById('source').value.length;
