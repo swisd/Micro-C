@@ -124,7 +124,7 @@ impl X86_64RawBackend {
         if let Some(params) = self.function_params.get(name) {
             for (i, param) in params.iter().enumerate() {
                 if i >= arg_regs.len() {
-                    error("Too many parameters for x86_64 ABI");
+                    error("@BACKEND  Too many parameters for x86_64 ABI");
                     return;
                 }
 
