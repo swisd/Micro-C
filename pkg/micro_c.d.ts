@@ -1,6 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 
+export function clear_errors(): void;
+
 export function compile_from_web(source_code: string, target_arch: string): string;
 
 export function get_errors(): string[];
@@ -13,6 +15,7 @@ export interface InitOutput {
     readonly memory: WebAssembly.Memory;
     readonly compile_from_web: (a: number, b: number, c: number, d: number) => [number, number];
     readonly get_errors: () => [number, number];
+    readonly clear_errors: () => void;
     readonly init_errors: () => void;
     readonly __wbindgen_externrefs: WebAssembly.Table;
     readonly __wbindgen_malloc: (a: number, b: number) => number;

@@ -1,5 +1,9 @@
 /* @ts-self-types="./micro_c.d.ts" */
 
+export function clear_errors() {
+    wasm.clear_errors();
+}
+
 /**
  * @param {string} source_code
  * @param {string} target_arch
