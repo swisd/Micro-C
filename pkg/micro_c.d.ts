@@ -3,15 +3,22 @@
 
 export function compile_from_web(source_code: string, target_arch: string): string;
 
+export function get_errors(): string[];
+
+export function init_errors(): void;
+
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
 
 export interface InitOutput {
     readonly memory: WebAssembly.Memory;
     readonly compile_from_web: (a: number, b: number, c: number, d: number) => [number, number];
+    readonly get_errors: () => [number, number];
+    readonly init_errors: () => void;
     readonly __wbindgen_externrefs: WebAssembly.Table;
     readonly __wbindgen_malloc: (a: number, b: number) => number;
     readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
     readonly __wbindgen_free: (a: number, b: number, c: number) => void;
+    readonly __externref_drop_slice: (a: number, b: number) => void;
     readonly __wbindgen_start: () => void;
 }
 
