@@ -1022,7 +1022,7 @@ export fn main() {
 
         function escapeHtml(text) {
             const div = document.createElement('div');
-            div.textContent = text;
+            div.textContent = `<pre>${text}</pre>`;
             return div.innerHTML;
         }
     </script>
