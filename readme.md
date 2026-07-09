@@ -3,9 +3,10 @@
 Micro-C is a minimalist, multi-target compiler written in Rust for a C-like systems programming language. It is designed to be small, understandable, and suitable for `no_std` environments (e.g., O[...]
 
 
-![](https://img.shields.io/badge/X86__64-functional-green)
-![](https://img.shields.io/badge/WIN64-semi_functional-yellow)
-![](https://img.shields.io/badge/ARM64-not%20working-red)
+![](https://img.shields.io/badge/X86__64-semi_functional-yellow)
+![](https://img.shields.io/badge/X86__64_HSIS-semi_functional-yellow)
+![](https://img.shields.io/badge/WIN64-nonfunctional-red)
+![](https://img.shields.io/badge/ARM64-nonfunctional-red)
 
 ## Features
 
