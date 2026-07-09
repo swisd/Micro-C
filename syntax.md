@@ -66,7 +66,7 @@ fn add(a, b) {
 
 ## Types
 
-Micro-C has three built-in types. All types are fixed-size and designed for low-level systems programming:
+Micro-C has five built-in types. All types are fixed-size and designed for low-level systems programming:
 
 ### i64 (64-bit Signed Integer)
 
@@ -112,9 +112,32 @@ let addr: ptr = 0x1000;      // Direct address
 - Can access struct fields via `.` notation
 - Can be read/written with `peek` and `poke`
 
+### array (List/Array type)
+
+A generic array type that can be used to store data, and can be nested.
+
+```c
+let list: array[3] = [0, 1, 2]; // list eith size of 3
+let buffer: array[0] = [...]; // unsized list. '...' is a placeholder
+let nest: array[3[0]] = [list, buffer, [1, 2]];
+```
+
+### str (Sized/Unsized string)
+
+A generic string type. it can be used with a length definer to use it as a set length slice or a char.
+
+```c
+let text: str = "text";
+let ch: str[1] = "A";
+let sized: str[5] = "hello";
+```
+
 ### Type Annotations
 
 Type annotations are optional but can be specified explicitly for clarity:
+> [!WARN]
+> It is recommended to use explicit types as inferred types may be dropped in upcoming updates.
+
 
 ```c
 let x = 42;              // Type inferred as i64
@@ -1333,19 +1356,32 @@ Groups of statements in `{ }`:
 
 ## Monostatements
 
-Monostatements are on-the-go statements and lically defined functions.
+Monostatements are on-the-go statements and locally defined functions.
 
 ### where
 
 `where` is used similar to lambda, to locally create ans evaluate a function.
 
 ```c
-
-let x = 10
-let y = add(x) where add(a) = { a + 10 }
-
+let x = 10;
+let y = add(x) where add(a) = { a + 10 };
 ```
 
+the declared function can also be used multiple times per line 
+```c
+
+let x = 10;
+let b = 3;
+let y = add( b * add(x) ) where add(a) = { a + 10 };
+```
+
+it can also define multiple single-arg functions per line. It can acess local variables upon closure of the function, but they must be static.
+```c
+
+let x = 10;
+let static c = 3;
+let y = add(mul(x)) where add(a) = { a + 10 } and mul(b) = { b * 3 };
+```
 
 
 ## Complete Examples
