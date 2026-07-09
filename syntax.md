@@ -18,6 +18,7 @@ This document provides a comprehensive guide to the Micro-C language syntax, wit
 12. [Return Statement](#return-statement)
 13. [Expressions](#expressions)
 14. [Statements](#statements)
+15. [Monostatememts](#monostatements)
 15. [Complete Examples](#complete-examples)
 
 ---
@@ -1329,6 +1330,23 @@ Groups of statements in `{ }`:
 ```
 
 ---
+
+## Monostatements
+
+Monostatements are on-the-go statements and lically defined functions.
+
+### where
+
+`where` is used similar to lambda, to locally create ans evaluate a function.
+
+```c
+
+let x = 10
+let y = add(x) where add(a) = { a + 10 }
+
+```
+
+
 
 ## Complete Examples
 
