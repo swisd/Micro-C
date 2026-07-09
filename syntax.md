@@ -135,7 +135,7 @@ let sized: str[5] = "hello";
 ### Type Annotations
 
 Type annotations are optional but can be specified explicitly for clarity:
-> [!WARN]
+> [!WARNING]
 > It is recommended to use explicit types as inferred types may be dropped in upcoming updates.
 
 
