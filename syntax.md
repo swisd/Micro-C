@@ -205,6 +205,13 @@ let negative = -42;
 let double_negative = -(-10);  // Valid expression
 ```
 
+### Type definitions
+
+New types can be define from a series of existing types.
+
+```c
+type char = str[1];
+```
 ---
 
 ## Variables and Assignment
