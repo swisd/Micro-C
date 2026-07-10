@@ -380,7 +380,7 @@ impl X86_64_HSISRawBackend {
     }
 }
 
-impl Architecture for X86_64RawBackend {
+impl Architecture for X86_64_HSISRawBackend {
     fn emit_program(&mut self, ir: &[IRInst]) -> String {
         let mut out = String::new();
 
