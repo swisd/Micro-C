@@ -15,6 +15,7 @@ Micro-C is a minimalist, multi-target compiler written in Rust for a C-like syst
   - `x86_64` (Raw Assembly)
   - `win64` (Windows x64 ABI)
   - `arm64` (AArch64)
+  - `x86_64_hsis` (HPVMx System Instruction Set)
 - **Minimal Dependencies**: Built with `no_std` and `alloc` only.
 - **IR-based Compilation**: Uses a custom Intermediate Representation (IR) for optimization and easier backend targeting.
 - **Register Allocation**: Basic register allocator for efficient code generation.
