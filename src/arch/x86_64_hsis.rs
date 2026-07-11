@@ -1,9 +1,7 @@
 // src/arch/x86_64_raw.rs
 
-//! Raw x86_64 backend.
-//!
-//! This backend generates x86_64 assembly without any specific OS ABI
-//! assumptions, suitable for bare-metal or simple bootloaders.
+//! Raw x86_64 backend for HPVMx system instruction set
+
 
 use alloc::string::String;
 use alloc::{format, vec};
@@ -124,7 +122,7 @@ impl X86_64_HSISRawBackend {
         if let Some(params) = self.function_params.get(name) {
             for (i, param) in params.iter().enumerate() {
                 if i >= arg_regs.len() {
-                    error("@BACKEND  Too many parameters for x86_64 ABI");
+                    error("@BACKEND  Too many parameters for x86_64_HSIS ABI");
                     return;
                 }
 
@@ -385,7 +383,7 @@ impl Architecture for X86_64_HSISRawBackend {
         let mut out = String::new();
 
         // raw binary asm header
-        out.push_str("; ARCH x86_64\n");
+        out.push_str("; ARCH x86_64_HSIS\n");
         out.push_str("; Generated ASM file. Modifications will not be preserved\n");
 
 
