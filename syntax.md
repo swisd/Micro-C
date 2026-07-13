@@ -220,9 +220,17 @@ type char = str[1];
 
 Declare a new variable using the `let` keyword:
 
+
 ```c
 let name = value;              // Type inferred from value
 let name: type = value;        // Explicit type annotation
+```
+
+Constants can be declared with the `let static` phrase.
+
+```c
+let static name = value;              // Type inferred from value
+let static name: type = value;        // Explicit type annotation
 ```
 
 **Basic Examples:**
