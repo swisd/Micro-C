@@ -1375,14 +1375,14 @@ Monostatements are on-the-go statements and locally defined functions.
 
 ### where
 
-`where` is used similar to lambda, to locally create ans evaluate a function.
+`where` is used similar to lambda, to locally create and evaluate a function.
 
 ```c
 let x = 10;
 let y = add(x) where add(a) = { a + 10 };
 ```
 
-the declared function can also be used multiple times per line 
+The declared function can also be used multiple times per line.
 ```c
 
 let x = 10;
@@ -1390,7 +1390,7 @@ let b = 3;
 let y = add( b * add(x) ) where add(a) = { a + 10 };
 ```
 
-it can also define multiple single-arg functions per line. It can acess local variables upon closure of the function, but they must be static.
+`where` can also be used to define multiple single-arg functions per line. It can acess local variables upon closure of the function, but they must be static.
 ```c
 
 let x = 10;
