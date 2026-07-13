@@ -1395,7 +1395,7 @@ let y = add( b * add(x) ) where add(a) = { a + 10 };
 
 let x = 10;
 let static c = 3;
-let y = add(mul(x)) where add(a) = { a + 10 } and mul(b) = { b * 3 };
+let y = add(mul(x)) where add(a) = { a + 10 } and mul(b) = { b * c };
 ```
 
 
