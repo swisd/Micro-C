@@ -8,6 +8,11 @@ Micro-C is a minimalist, multi-target compiler written in Rust for a C-like syst
 ![](https://img.shields.io/badge/WIN64-nonfunctional-red)
 ![](https://img.shields.io/badge/ARM64-nonfunctional-red)
 
+> [!WARNING] 
+> Semi functional architectures may and/or will not output ASM for unimplemented or broken syntax. 
+Make sure to check the error output of the compiler.
+
+
 ## Features
 
 - **C-like Syntax**: Familiar syntax for systems programmers.
