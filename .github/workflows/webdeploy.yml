@@ -1,0 +1,37 @@
+name: Deploy Web Compiler Playground
+
+on:
+  push:
+    branches: [ master, main ] # Triggers whenever you push changes to master or main
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Set up Rust Toolchain
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        targets: wasm32-unknown-unknown
+
+    - name: Install wasm-bindgen CLI
+      run: cargo install wasm-bindgen-cli
+
+    - name: Compile no_std Web Crate
+      run: cargo build --target wasm32-unknown-unknown --release
+
+    - name: Extract JavaScript Bindings
+      run: |
+        mkdir -p web/pkg
+        wasm-bindgen target/wasm32-unknown-unknown/release/micro_c.wasm --target web --out-dir web/pkg
+
+    - name: Deploy web/ folder to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v4
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./web # Restricts deployment purely to your website frontend elements

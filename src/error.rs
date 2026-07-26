@@ -2,10 +2,16 @@
 //!
 //! This module provides functions for reporting compilation errors
 //! and printing messages in a `no_std` environment.
+#![allow(static_mut_refs)]
+
 
 use alloc::format;
 use alloc::string::{String, ToString};
 use core::fmt::{Write, Error};
+use alloc::vec::Vec;
+
+// Static mutable array to collect errors for WASM logging
+static mut ERRORS: Option<Vec<String>> = None;
 
 struct MyWriter;
 
@@ -19,9 +25,40 @@ impl Write for MyWriter {
     }
 }
 
-/// Reports a fatal error and panics.
+/// Initializes the error collection system.
+/// Should be called before compilation begins.
+pub fn init_errors() {
+    unsafe {
+        ERRORS = Some(Vec::new());
+    }
+}
+
+/// Pushes an error message to the static error array.
+/// This allows errors to be collected and retrieved for logging in WASM.
 pub fn error(message: &str) {
-    panic!("!! {}", message)
+    let formatted = format!("!! {}", message);
+    unsafe {
+        if let Some(ref mut errors) = ERRORS {
+            errors.push(formatted);
+        }
+    }
+}
+
+/// Retrieves all collected errors as a Vec of Strings.
+/// Returns a cloned copy of the error array.
+pub fn get_errors() -> Vec<String> {
+    unsafe {
+        ERRORS.as_ref().cloned().unwrap_or_default()
+    }
+}
+
+/// Clears all collected errors.
+pub fn clear_errors() {
+    unsafe {
+        if let Some(ref mut errors) = ERRORS {
+            errors.clear();
+        }
+    }
 }
 
 /// Prints a message to the output.

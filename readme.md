@@ -1,11 +1,17 @@
 # Micro-C
 
-Micro-C is a minimalist, multi-target compiler written in Rust for a C-like systems programming language. It is designed to be small, understandable, and suitable for `no_std` environments (e.g., OS kernels or embedded systems).
+Micro-C is a minimalist, multi-target compiler written in Rust for a C-like systems programming language. It is designed to be small, understandable, and suitable for `no_std` environments (e.g., O[...]
 
 
-![](https://img.shields.io/badge/X86__64-functional-green)
-![](https://img.shields.io/badge/WIN64-semi_functional-yellow)
-![](https://img.shields.io/badge/ARM64-not%20working-red)
+![](https://img.shields.io/badge/X86__64-semi_functional-yellow)
+![](https://img.shields.io/badge/X86__64_HSIS-nonfunctional-red)
+![](https://img.shields.io/badge/WIN64-nonfunctional-red)
+![](https://img.shields.io/badge/ARM64-nonfunctional-red)
+
+> [!WARNING] 
+> Semi functional architectures may and/or will not output ASM for unimplemented or broken syntax/IR. 
+Make sure to check the error output of the compiler for any issues.
+
 
 ## Features
 
@@ -14,6 +20,7 @@ Micro-C is a minimalist, multi-target compiler written in Rust for a C-like syst
   - `x86_64` (Raw Assembly)
   - `win64` (Windows x64 ABI)
   - `arm64` (AArch64)
+  - `x86_64_hsis` (HPVMx System Instruction Set)
 - **Minimal Dependencies**: Built with `no_std` and `alloc` only.
 - **IR-based Compilation**: Uses a custom Intermediate Representation (IR) for optimization and easier backend targeting.
 - **Register Allocation**: Basic register allocator for efficient code generation.
@@ -22,7 +29,7 @@ Micro-C is a minimalist, multi-target compiler written in Rust for a C-like syst
 
 - **Functions**: Support for function definitions, parameters, and calls.
 - **Variables**: Local variables with `let`.
-- **Control Flow**: `if`, `else`, and `loop` statements.
+- **Control Flow**: `if`, `else`, `elif`, and `loop` statements.
 - **Arithmetic**: Basic operations (`+`, `-`, `*`, `/`) and comparisons.
 - **Structs**: Basic structure definitions (WIP).
 - **Pointers**: `peek` and `poke` for direct memory access.
@@ -58,18 +65,10 @@ let asm = compile(source, "x86_64");
 println!("{}", asm);
 ```
 
-External functions can be declared and called like normal functions:
+## Syntax
 
-```c
-#include <Sys>
+[See the syntax doc](syntax.md)
 
-extern fn host_add(a, b);
-
-export fn main() {
-    let ptr = malloc(64);
-    return host_add(ptr, 1);
-}
-```
 
 ## Project Structure
 
